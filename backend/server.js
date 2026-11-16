@@ -2,35 +2,95 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+
 const authRoutes = require('./src/routes/auth');
-const app = express();
-const calcRoutes = require('./src/routes/calculator')
+const calcRoutes = require('./src/routes/calculator');
 const treatyRoutes = require('./src/routes/treaty');
 const taxRoute = require('./src/routes/tax');
 const simulatorRoutes = require('./src/routes/simulator');
 const chatRoutes = require('./src/routes/chat');
 
+const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serverless MongoDB Connection Cache (Vercel-ready)
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    throw new Error('MONGO_URI is missing in environment variables.');
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false, // Prevents 10s buffering timeout; throws clear connection error immediately
+      serverSelectionTimeoutMS: 5000,
+    };
+    cached.promise = mongoose.connect(uri, opts).then((m) => {
+      console.log('MongoDB Connected successfully');
+      return m;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    throw err;
+  }
+
+  return cached.conn;
+}
+
+// Ensure DB connection before processing database routes
+app.use(async (req, res, next) => {
+  if (req.path === '/' || req.path === '/api/health') {
+    return next();
+  }
+
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error:', err.message);
+    return res.status(500).json({
+      message: `Database Connection Error: ${err.message}. If deployed on Vercel, check that MONGO_URI is set in Vercel and 0.0.0.0/0 is allowed in MongoDB Atlas Network Access.`
+    });
+  }
+});
+
+// Routes
 app.use('/api/auth', authRoutes);
-app.use("/api", calcRoutes);
-app.use("/api", taxRoute);
+app.use('/api', calcRoutes);
+app.use('/api', taxRoute);
 app.use('/api', treatyRoutes);
 app.use('/api/structure', simulatorRoutes);
 app.use('/api', chatRoutes);
-// Test Route
+
+// Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'TaxGlobe Backend Running...' });
+  res.json({ message: 'TaxGlobe Backend Running...', status: 'OK' });
 });
 
-// DB Connect
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch((err) => console.log('MongoDB Error:', err.message));
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date() });
+});
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start local listener only if not on Vercel
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
 
 module.exports = app;
