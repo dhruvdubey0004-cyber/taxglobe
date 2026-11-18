@@ -8,7 +8,8 @@ const onboardingSchema = new mongoose.Schema(
         monthlyBilling: { type: String, default: '' },
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
         createdAt: { type: Date, default: Date.now }
-    }
-)
+    },
+    { collection: 'onboarding' } // Explicitly matches the exact MongoDB collection
+);
 
-module.exports = mongoose.model("onboarding", onboardingSchema);
+module.exports = mongoose.model("onboarding", onboardingSchema, "onboarding");

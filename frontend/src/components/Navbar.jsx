@@ -5,14 +5,6 @@ import {
   User, Menu, X, Wifi, WifiOff, Users, Sparkles, ChevronDown
 } from 'lucide-react';
 
-const tabs = [
-  { id: 'calculator', label: 'Calculator', icon: Calculator },
-  { id: 'simulator', label: 'HoldCo Simulator', icon: Layers },
-  { id: 'treaties', label: 'Treaty Rules', icon: BookOpen },
-  { id: 'corridors', label: 'Corridors', icon: Map },
-  { id: 'leads', label: 'Leads', icon: Users },
-];
-
 export default function Navbar({
   activeTab,
   setActiveTab,
@@ -23,6 +15,14 @@ export default function Navbar({
   onOpenOnboarding
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const tabs = [
+    { id: 'calculator', label: 'Calculator', icon: Calculator },
+    { id: 'simulator', label: 'HoldCo Simulator', icon: Layers },
+    { id: 'treaties', label: 'Treaty Rules', icon: BookOpen },
+    { id: 'corridors', label: 'Corridors', icon: Map },
+    ...(user ? [{ id: 'leads', label: user.role === 'Admin' ? 'All Leads' : 'My Onboarding', icon: Users }] : []),
+  ];
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-gray-200/60 shadow-[0_2px_15px_-4px_rgba(0,0,0,0.05)] transition-all">

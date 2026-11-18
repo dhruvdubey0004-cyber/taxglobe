@@ -53,11 +53,26 @@ export default function App() {
   function logout() {
     localStorage.removeItem('taxglobe_token');
     localStorage.removeItem('taxglobe_user');
+    localStorage.removeItem('taxglobe_onboarded');
+    localStorage.removeItem('taxglobe_onboarded_profile');
+    sessionStorage.clear();
     setUser(null);
+    if (activeTab === 'leads') {
+      changeTab('home');
+    }
     showToast('Logged out successfully', 'info');
   }
 
+  function handleLogin(newUser) {
+    sessionStorage.clear();
+    localStorage.removeItem('taxglobe_onboarded');
+    localStorage.removeItem('taxglobe_onboarded_profile');
+    setUser(newUser);
+  }
+
   const sharedProps = { showToast, setApiStatus };
+
+  const userKey = user?._id || user?.id || 'guest';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,13 +94,13 @@ export default function App() {
             </motion.div>
           )}
           {activeTab === 'calculator' && (
-            <motion.div key="calculator" {...pageVariants}>
-              <Calculator {...sharedProps} />
+            <motion.div key={`calculator-${userKey}`} {...pageVariants}>
+              <Calculator key={`calc-${userKey}`} {...sharedProps} user={user} />
             </motion.div>
           )}
           {activeTab === 'simulator' && (
-            <motion.div key="simulator" {...pageVariants}>
-              <Simulator {...sharedProps} />
+            <motion.div key={`simulator-${userKey}`} {...pageVariants}>
+              <Simulator key={`sim-${userKey}`} {...sharedProps} user={user} />
             </motion.div>
           )}
           {activeTab === 'treaties' && (
@@ -99,8 +114,14 @@ export default function App() {
             </motion.div>
           )}
           {activeTab === 'leads' && (
-            <motion.div key="leads" {...pageVariants}>
-              <OnboardingLeads onOpenOnboarding={() => setOnboardingOpen(true)} showToast={showToast} />
+            <motion.div key={`leads-${userKey}`} {...pageVariants}>
+              <OnboardingLeads
+                key={`leads-comp-${userKey}`}
+                user={user}
+                onOpenOnboarding={() => setOnboardingOpen(true)}
+                onOpenAuth={() => setAuthOpen(true)}
+                showToast={showToast}
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -130,7 +151,7 @@ export default function App() {
         {authOpen && (
           <AuthModal
             onClose={() => setAuthOpen(false)}
-            onLogin={setUser}
+            onLogin={handleLogin}
             showToast={showToast}
           />
         )}
@@ -147,7 +168,7 @@ export default function App() {
       />
 
       <Toast toast={toast} onClose={() => setToast(null)} />
-      <TaxBot onNavigateTab={changeTab} />
+      <TaxBot key={`taxbot-${userKey}`} onNavigateTab={changeTab} />
     </div>
   );
 }

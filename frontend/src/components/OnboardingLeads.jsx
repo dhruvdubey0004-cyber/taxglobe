@@ -2,17 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Search, RefreshCw, Plus, Calendar, Building2,
-  Globe, DollarSign, CheckCircle2, Loader2, ArrowUpRight
+  Globe, DollarSign, CheckCircle2, Loader2, ArrowUpRight, Trash2, Lock
 } from 'lucide-react';
 import { apiFetch } from '../utils';
 
-export default function OnboardingLeads({ onOpenOnboarding, showToast }) {
+export default function OnboardingLeads({ user, onOpenOnboarding, onOpenAuth, showToast }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('ALL');
 
   async function fetchLeads() {
+    if (!user) {
+      setLeads([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const res = await apiFetch('/api/onboarding');
@@ -30,7 +35,40 @@ export default function OnboardingLeads({ onOpenOnboarding, showToast }) {
 
   useEffect(() => {
     fetchLeads();
-  }, []);
+  }, [user]);
+
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this onboarding lead record?')) return;
+    try {
+      await apiFetch(`/api/onboarding/${id}`, { method: 'DELETE' });
+      showToast('Lead deleted', 'success');
+      setLeads(prev => prev.filter(l => l._id !== id));
+    } catch (err) {
+      showToast(`Delete failed: ${err.message}`, 'error');
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto my-16 px-4">
+        <div className="glass rounded-3xl p-8 text-center shadow-lg border border-white/80">
+          <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600">
+            <Lock className="w-7 h-7" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-1.5">Sign In to View Onboarding</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mb-6">
+            Log in to view and manage your submitted onboarding profile and tax recommendations.
+          </p>
+          <button
+            onClick={onOpenAuth}
+            className="btn-primary w-full py-2.5 shadow-sm text-sm"
+          >
+            Sign In / Register
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const filtered = leads.filter(item => {
     const q = search.toLowerCase();
@@ -221,9 +259,18 @@ export default function OnboardingLeads({ onOpenOnboarding, showToast }) {
                         </td>
 
                         <td className="px-5 py-4 whitespace-nowrap text-right">
-                          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-semibold">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified
-                          </span>
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified
+                            </span>
+                            <button
+                              onClick={() => handleDelete(item._id)}
+                              className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Delete record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </motion.tr>
                     );
