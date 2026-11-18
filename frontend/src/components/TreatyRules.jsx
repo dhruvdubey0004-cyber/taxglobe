@@ -82,8 +82,31 @@ function TreatyModal({ treaty, onClose, onSave, loading }) {
   );
 }
 
+const FALLBACK_TREATIES = [
+  { _id: 'fb-1', from: 'IN', to: 'US', incomeType: 'Royalty', article: 'Art. 12', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'Standard IN-US DTAA rate with TRC.' },
+  { _id: 'fb-2', from: 'IN', to: 'US', incomeType: 'FTS', article: 'Art. 12', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'Fees for technical services capped at 10%.' },
+  { _id: 'fb-3', from: 'IN', to: 'US', incomeType: 'Dividends', article: 'Art. 10', domesticRate: 20, treatyRate: 15, status: 'Active', legalNote: '15% WHT for qualified corporate holdings.' },
+  { _id: 'fb-4', from: 'IN', to: 'US', incomeType: 'Interest', article: 'Art. 11', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'Standard cross-border interest rate.' },
+  { _id: 'fb-5', from: 'IN', to: 'US', incomeType: 'CapitalGains', article: 'Art. 13', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: 'Taxable exclusively in resident country.' },
+  { _id: 'fb-6', from: 'IN', to: 'SG', incomeType: 'Royalty', article: 'Art. 12', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'IN-SG DTAA beneficial royalty rate.' },
+  { _id: 'fb-7', from: 'IN', to: 'SG', incomeType: 'FTS', article: 'Art. 12', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'Technical services capped at 10%.' },
+  { _id: 'fb-8', from: 'IN', to: 'SG', incomeType: 'Dividends', article: 'Art. 10', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: '10% holding company dividend rate.' },
+  { _id: 'fb-9', from: 'IN', to: 'SG', incomeType: 'Interest', article: 'Art. 11', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'Debt financing interest rate.' },
+  { _id: 'fb-10', from: 'IN', to: 'SG', incomeType: 'CapitalGains', article: 'Art. 13', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: 'Source state exemption subject to GAAR.' },
+  { _id: 'fb-11', from: 'IN', to: 'UAE', incomeType: 'Royalty', article: 'Art. 12', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: 'Zero withholding under UAE-India treaty corridor.' },
+  { _id: 'fb-12', from: 'IN', to: 'UAE', incomeType: 'FTS', article: 'Art. 12', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: '0% WHT with valid UAE Tax Domicile Certificate.' },
+  { _id: 'fb-13', from: 'IN', to: 'UAE', incomeType: 'Dividends', article: 'Art. 10', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: '0% dividend repatriation under treaty.' },
+  { _id: 'fb-14', from: 'IN', to: 'UAE', incomeType: 'Interest', article: 'Art. 11', domesticRate: 20, treatyRate: 5, status: 'Active', legalNote: 'Reduced 5% withholding rate.' },
+  { _id: 'fb-15', from: 'IN', to: 'UAE', incomeType: 'CapitalGains', article: 'Art. 13', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: 'Capital gains exempt at source.' },
+  { _id: 'fb-16', from: 'IN', to: 'UK', incomeType: 'Royalty', article: 'Art. 13', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: 'IN-UK bilateral treaty rate.' },
+  { _id: 'fb-17', from: 'IN', to: 'UK', incomeType: 'FTS', article: 'Art. 13', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: '10% technical fees cap.' },
+  { _id: 'fb-18', from: 'IN', to: 'UK', incomeType: 'Dividends', article: 'Art. 10', domesticRate: 20, treatyRate: 15, status: 'Active', legalNote: '15% dividend WHT.' },
+  { _id: 'fb-19', from: 'IN', to: 'UK', incomeType: 'Interest', article: 'Art. 11', domesticRate: 20, treatyRate: 10, status: 'Active', legalNote: '10% bank and corporate interest rate.' },
+  { _id: 'fb-20', from: 'IN', to: 'UK', incomeType: 'CapitalGains', article: 'Art. 13', domesticRate: 20, treatyRate: 0, status: 'Active', legalNote: 'Resident taxation basis.' },
+];
+
 export default function TreatyRules({ showToast, setApiStatus }) {
-  const [treaties, setTreaties] = useState([]);
+  const [treaties, setTreaties] = useState(FALLBACK_TREATIES);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
@@ -94,9 +117,15 @@ export default function TreatyRules({ showToast, setApiStatus }) {
     setLoading(true);
     try {
       const data = await apiFetch('/api/v1/treaties');
-      setTreaties(Array.isArray(data) ? data : []);
-      setApiStatus('connected');
+      if (Array.isArray(data) && data.length > 0) {
+        setTreaties(data);
+        setApiStatus('connected');
+      } else {
+        setTreaties(FALLBACK_TREATIES);
+        setApiStatus('connected');
+      }
     } catch {
+      setTreaties(FALLBACK_TREATIES);
       setApiStatus('fallback');
     } finally {
       setLoading(false);

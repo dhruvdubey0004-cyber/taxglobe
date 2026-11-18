@@ -4,8 +4,8 @@ const Simulation = require('../models/simulation');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// GET /api/treaties - dropdown ke liye
-router.get('/treaties', auth, async (req, res) => {
+// GET /api/treaties - dropdown ke liye (Public)
+router.get('/treaties', async (req, res) => {
   const { from, to } = req.query;
   const filter = {};
   if (from) filter.from_country = from;
@@ -14,8 +14,8 @@ router.get('/treaties', auth, async (req, res) => {
   res.json(list);
 });
 
-// POST /api/v1/tax/calculate
-router.post('/v1/tax/calculate', auth, async (req, res) => {
+// POST /api/v1/tax/calculate (Public calculator)
+router.post('/v1/tax/calculate', async (req, res) => {
   try {
     let { from, to, income_type, gross_income } = req.body;
 

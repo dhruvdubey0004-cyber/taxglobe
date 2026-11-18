@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
-import { ArrowRight, TrendingUp, Shield, Zap, Globe } from 'lucide-react';
+import { ArrowRight, TrendingUp, Shield, Zap, Globe, Sparkles } from 'lucide-react';
 
 const stats = [
   { label: 'Average WHT Saved', value: '50–100%', sub: 'vs domestic rates' },
@@ -17,7 +17,7 @@ const features = [
   { icon: Zap, title: 'Corridor Maps', desc: 'Visual mapping of tax-efficient corridors for cross-border structuring.' },
 ];
 
-export default function HeroSection({ onGetStarted }) {
+export default function HeroSection({ onGetStarted, onOpenOnboarding }) {
   const statsRef = useRef([]);
 
   useEffect(() => {
@@ -61,8 +61,11 @@ export default function HeroSection({ onGetStarted }) {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            <button onClick={() => onGetStarted('calculator')} className="btn-primary flex items-center gap-2 text-sm sm:text-base">
-              Calculate My Savings <ArrowRight className="w-4 h-4" />
+            <button onClick={onOpenOnboarding} className="btn-primary flex items-center gap-2 text-sm sm:text-base">
+              <Sparkles className="w-4 h-4" /> Start Onboarding Setup
+            </button>
+            <button onClick={() => onGetStarted('calculator')} className="btn-secondary flex items-center gap-2 text-sm sm:text-base">
+              Calculate Savings <ArrowRight className="w-4 h-4" />
             </button>
             <button onClick={() => onGetStarted('treaties')} className="btn-secondary flex items-center gap-2 text-sm sm:text-base">
               View Treaty Registry

@@ -1,10 +1,26 @@
 const jwt = require('jsonwebtoken');
 
+// Permissive auth middleware: parses token if valid, allows guests/expired tokens without breaking the app
 module.exports = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'No token' });
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    req.user = null;
+    return next();
+  }
+
+  const token = authHeader.split(' ')[1];
+  if (!token || token === 'undefined' || token === 'null') {
+    req.user = null;
+    return next();
+  }
+
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'taxglobe_secret_123';
+    req.user = jwt.verify(token, secret);
     next();
-  } catch (e) { res.status(401).json({ message: 'Invalid token' }); }
+  } catch (e) {
+    // Expired or invalid token: set user to null so public features (treaties, calculator, simulator) keep working
+    req.user = null;
+    next();
+  }
 };

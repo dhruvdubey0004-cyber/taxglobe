@@ -2,8 +2,8 @@ const express = require('express');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// POST /api/structure/simulate
-router.post('/simulate', auth, async (req, res) => {
+// POST /api/structure/simulate (Public simulator)
+router.post('/simulate', async (req, res) => {
   try {
     const { customer_location, investor_location, founder_location, business_type } = req.body;
 

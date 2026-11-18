@@ -19,8 +19,8 @@ function formatTreaty(doc) {
   };
 }
 
-// GET /api/v1/treaties
-router.get('/v1/treaties', auth, async (req, res) => {
+// GET /api/v1/treaties (Public access: Anyone can browse bilateral treaties)
+router.get('/v1/treaties', async (req, res) => {
   try {
     const { from, to, incomeType } = req.query;
     const filter = {};

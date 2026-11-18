@@ -10,6 +10,11 @@ export async function apiFetch(endpoint, options = {}) {
   };
   const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
   if (!res.ok) {
+    if (res.status === 401) {
+      // Clear expired / invalid token
+      localStorage.removeItem('taxglobe_token');
+      localStorage.removeItem('taxglobe_user');
+    }
     const err = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
     throw new Error(err.message || `HTTP ${res.status}`);
   }

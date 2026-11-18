@@ -9,6 +9,8 @@ import CorridorMaps from './components/CorridorMaps';
 import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import TaxBot from './components/TaxBot';
+import OnboardingModal from './components/OnboardingModal';
+import OnboardingLeads from './components/OnboardingLeads';
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -20,13 +22,14 @@ export default function App() {
   // Read tab from URL hash on load, default to 'calculator'
   const getTabFromHash = () => {
     const hash = window.location.hash.replace('#', '');
-    const valid = ['home', 'calculator', 'simulator', 'treaties', 'corridors'];
+    const valid = ['home', 'calculator', 'simulator', 'treaties', 'corridors', 'leads'];
     return valid.includes(hash) ? hash : 'calculator';
   };
 
   const [activeTab, setActiveTab] = useState(getTabFromHash);
   const [apiStatus, setApiStatus] = useState('checking');
   const [authOpen, setAuthOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('taxglobe_user') || 'null'); } catch { return null; }
@@ -65,13 +68,14 @@ export default function App() {
         apiStatus={apiStatus}
         onAuthClick={() => setAuthOpen(true)}
         onLogout={logout}
+        onOpenOnboarding={() => setOnboardingOpen(true)}
       />
 
       <main className="pb-12 flex-1">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" {...pageVariants}>
-              <HeroSection onGetStarted={changeTab} />
+              <HeroSection onGetStarted={changeTab} onOpenOnboarding={() => setOnboardingOpen(true)} />
             </motion.div>
           )}
           {activeTab === 'calculator' && (
@@ -92,6 +96,11 @@ export default function App() {
           {activeTab === 'corridors' && (
             <motion.div key="corridors" {...pageVariants}>
               <CorridorMaps />
+            </motion.div>
+          )}
+          {activeTab === 'leads' && (
+            <motion.div key="leads" {...pageVariants}>
+              <OnboardingLeads onOpenOnboarding={() => setOnboardingOpen(true)} showToast={showToast} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -126,6 +135,16 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      <OnboardingModal
+        isOpen={onboardingOpen}
+        onClose={() => setOnboardingOpen(false)}
+        onComplete={(tab) => {
+          setOnboardingOpen(false);
+          if (tab) changeTab(tab);
+        }}
+        showToast={showToast}
+      />
 
       <Toast toast={toast} onClose={() => setToast(null)} />
       <TaxBot onNavigateTab={changeTab} />

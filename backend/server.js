@@ -9,12 +9,16 @@ const treatyRoutes = require('./src/routes/treaty');
 const taxRoute = require('./src/routes/tax');
 const simulatorRoutes = require('./src/routes/simulator');
 const chatRoutes = require('./src/routes/chat');
+const onboardingRoutes = require('./src/routes/onboarding');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Disable query buffering globally so Mongoose immediately alerts if DB is disconnected instead of hanging 10000ms
+mongoose.set('bufferCommands', false);
 
 // Serverless MongoDB Connection Cache (Vercel-ready)
 let cached = global.mongoose;
@@ -23,7 +27,7 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) {
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
@@ -34,8 +38,8 @@ async function connectDB() {
 
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false, // Prevents 10s buffering timeout; throws clear connection error immediately
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 10000,
     };
     cached.promise = mongoose.connect(uri, opts).then((m) => {
       console.log('MongoDB Connected successfully');
@@ -77,6 +81,7 @@ app.use('/api', taxRoute);
 app.use('/api', treatyRoutes);
 app.use('/api/structure', simulatorRoutes);
 app.use('/api', chatRoutes);
+app.use('/api',onboardingRoutes)
 
 // Health check
 app.get('/', (req, res) => {
