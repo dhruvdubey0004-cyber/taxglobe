@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Check, ArrowRight, ArrowLeft, Sparkles, Building2,
-  Laptop, Briefcase, Globe, TrendingUp, ShieldCheck, CheckCircle2
+  Laptop, Briefcase, Globe, TrendingUp, ShieldCheck, CheckCircle2,
+  Mail, Phone, KeyRound, Loader2
 } from 'lucide-react';
 import { apiFetch } from '../utils';
 
@@ -35,6 +36,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: '',
+    email: '',
+    phone: '',
     country: 'India',
     businessType: 'SaaS',
     monthlyBilling: '₹5L - ₹20 Lakhs',
@@ -42,11 +45,106 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
 
+  // OTP states
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(0);
+
+  // Cooldown timer for resend
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const timer = setTimeout(() => setOtpCooldown(c => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [otpCooldown]);
+
+  // Reset OTP state if email changes after OTP was sent
+  useEffect(() => {
+    if (otpSent && !otpVerified) {
+      setOtpSent(false);
+      setOtpValue('');
+      setOtpError('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.email]);
+
   if (!isOpen) return null;
+
+  // Send OTP to email
+  async function handleSendOTP() {
+    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) {
+      setOtpError('Please enter a valid email address');
+      return;
+    }
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      const res = await apiFetch('/api/otp/send', {
+        method: 'POST',
+        body: JSON.stringify({ email: form.email }),
+      });
+      if (res.success) {
+        setOtpSent(true);
+        setOtpCooldown(60); // 60 seconds cooldown for resend
+        if (res.devOtp) {
+          setOtpValue(res.devOtp);
+          showToast(`Dev OTP: ${res.devOtp} (Auto-filled)`, 'info');
+        } else {
+          showToast('OTP sent to your email!', 'success');
+        }
+      }
+    } catch (err) {
+      setOtpError(err.message || 'Failed to send OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  }
+
+  // Verify OTP
+  async function handleVerifyOTP() {
+    if (!otpValue.trim() || otpValue.length !== 6) {
+      setOtpError('Please enter the 6-digit OTP');
+      return;
+    }
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      const res = await apiFetch('/api/otp/verify', {
+        method: 'POST',
+        body: JSON.stringify({ email: form.email, otp: otpValue }),
+      });
+      if (res.success) {
+        setOtpVerified(true);
+        setOtpError('');
+        showToast('Email verified successfully! ✅', 'success');
+      }
+    } catch (err) {
+      setOtpError(err.message || 'Invalid or expired OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  }
 
   async function handleSubmit() {
     if (!form.name.trim()) {
       showToast('Please enter your name', 'error');
+      setStep(1);
+      return;
+    }
+    if (!form.email.trim()) {
+      showToast('Please enter your email', 'error');
+      setStep(1);
+      return;
+    }
+    if (!form.phone.trim()) {
+      showToast('Please enter your phone number', 'error');
+      setStep(1);
+      return;
+    }
+    if (!otpVerified) {
+      showToast('Please verify your email with OTP first', 'error');
       setStep(1);
       return;
     }
@@ -55,7 +153,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
     try {
       const res = await apiFetch('/api/onboarding', {
         method: 'POST',
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, emailVerified: otpVerified }),
       });
 
       if (res.success || res.data) {
@@ -115,12 +213,12 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
                   <span className="text-xs text-gray-400 font-medium">Quick Onboarding</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900">
-                  {step === 1 && 'Welcome! Let’s personalize your tax setup'}
+                  {step === 1 && 'Welcome! Verify & personalize your setup'}
                   {step === 2 && 'What type of business do you operate?'}
                   {step === 3 && 'What is your monthly cross-border billing?'}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                  {step === 1 && 'Tell us your name and base jurisdiction to identify matching bilateral treaties.'}
+                  {step === 1 && 'Enter your details and verify your email with OTP to proceed.'}
                   {step === 2 && 'Different business models qualify for specific DTAA exemptions (Royalties vs FTS vs Services).'}
                   {step === 3 && 'We estimate your potential withholding tax savings based on your billing volume.'}
                 </p>
@@ -134,9 +232,10 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
                 </div>
               </div>
 
-              {/* STEP 1: Name & Country */}
+              {/* STEP 1: Name, Email, Phone, OTP & Country */}
               {step === 1 && (
                 <div className="space-y-4">
+                  {/* Name */}
                   <div>
                     <label className="label-sm">Your Name / Legal Entity Name *</label>
                     <input
@@ -149,6 +248,111 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
                     />
                   </div>
 
+                  {/* Email + Send OTP */}
+                  <div>
+                    <label className="label-sm flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5" /> Email Address *
+                      {otpVerified && (
+                        <span className="ml-auto text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Verified
+                        </span>
+                      )}
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        className={`input-field py-3 text-base flex-1 ${otpVerified ? 'bg-emerald-50/50 border-emerald-200' : ''}`}
+                        placeholder="you@example.com"
+                        value={form.email}
+                        onChange={e => {
+                          setForm(f => ({ ...f, email: e.target.value }));
+                          if (otpVerified) {
+                            setOtpVerified(false);
+                            setOtpSent(false);
+                            setOtpValue('');
+                          }
+                        }}
+                        disabled={otpVerified}
+                      />
+                      {!otpVerified && (
+                        <button
+                          type="button"
+                          onClick={handleSendOTP}
+                          disabled={otpLoading || !form.email.trim() || otpCooldown > 0}
+                          className="btn-primary text-xs px-4 py-2.5 whitespace-nowrap flex items-center gap-1.5 disabled:opacity-40"
+                        >
+                          {otpLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <KeyRound className="w-3.5 h-3.5" />
+                          )}
+                          {otpCooldown > 0 ? `Resend (${otpCooldown}s)` : otpSent ? 'Resend OTP' : 'Send OTP'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OTP Input — shows after OTP is sent, hides after verified */}
+                  {otpSent && !otpVerified && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="space-y-2"
+                    >
+                      <label className="label-sm flex items-center gap-1.5">
+                        <KeyRound className="w-3.5 h-3.5" /> Enter 6-Digit OTP
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          className="input-field py-3 text-base text-center tracking-[0.5em] font-bold flex-1"
+                          placeholder="● ● ● ● ● ●"
+                          value={otpValue}
+                          onChange={e => {
+                            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                            setOtpValue(val);
+                            setOtpError('');
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyOTP}
+                          disabled={otpLoading || otpValue.length !== 6}
+                          className="btn-primary text-xs px-5 py-2.5 whitespace-nowrap flex items-center gap-1.5 disabled:opacity-40"
+                        >
+                          {otpLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4" />
+                          )}
+                          Verify
+                        </button>
+                      </div>
+                      {otpError && (
+                        <p className="text-xs text-red-500 font-medium">{otpError}</p>
+                      )}
+                      <p className="text-xs text-gray-400">Check your email inbox (and spam folder) for the OTP.</p>
+                    </motion.div>
+                  )}
+
+                  {/* Phone Number */}
+                  <div>
+                    <label className="label-sm flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5" /> Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      className="input-field py-3 text-base"
+                      placeholder="+91 9876543210"
+                      value={form.phone}
+                      onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Country */}
                   <div>
                     <label className="label-sm">Primary Base Country</label>
                     <select
@@ -167,7 +371,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
                   <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5 flex items-start gap-3 mt-4">
                     <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <p className="text-xs text-emerald-900 leading-relaxed">
-                      Your details are securely mapped to identify relevant Section 90 provisions and applicable bilateral treaties with the US, Singapore, UAE, and UK.
+                      OTP verification ensures only genuine users proceed. Your details are securely mapped to identify relevant Section 90 provisions and applicable bilateral treaties.
                     </p>
                   </div>
                 </div>
@@ -259,7 +463,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
                 {step < 3 ? (
                   <button
                     type="button"
-                    disabled={step === 1 && !form.name.trim()}
+                    disabled={(step === 1 && (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !otpVerified))}
                     onClick={() => setStep(s => s + 1)}
                     className="btn-primary text-xs sm:text-sm py-2 px-5 flex items-center gap-1.5 disabled:opacity-40"
                   >

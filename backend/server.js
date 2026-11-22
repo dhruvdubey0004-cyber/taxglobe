@@ -10,6 +10,8 @@ const taxRoute = require('./src/routes/tax');
 const simulatorRoutes = require('./src/routes/simulator');
 const chatRoutes = require('./src/routes/chat');
 const onboardingRoutes = require('./src/routes/onboarding');
+const otpRoutes = require('./src/routes/otp');
+const adminRoutes = require('./src/routes/admin');
 
 const app = express();
 
@@ -81,7 +83,9 @@ app.use('/api', taxRoute);
 app.use('/api', treatyRoutes);
 app.use('/api/structure', simulatorRoutes);
 app.use('/api', chatRoutes);
-app.use('/api',onboardingRoutes)
+app.use('/api', onboardingRoutes);
+app.use('/api/otp', otpRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {

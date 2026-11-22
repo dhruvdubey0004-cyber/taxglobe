@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Globe, Calculator, Layers, BookOpen, Map, LogOut,
-  User, Menu, X, Wifi, WifiOff, Users, Sparkles, ChevronDown
+  User, Menu, X, Wifi, WifiOff, Users, Sparkles, ChevronDown,
+  ShieldCheck, Lock
 } from 'lucide-react';
 
 export default function Navbar({
@@ -15,6 +16,19 @@ export default function Navbar({
   onOpenOnboarding
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authDropdownOpen, setAuthDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setAuthDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const tabs = [
     { id: 'calculator', label: 'Calculator', icon: Calculator },
@@ -22,6 +36,7 @@ export default function Navbar({
     { id: 'treaties', label: 'Treaty Rules', icon: BookOpen },
     { id: 'corridors', label: 'Corridors', icon: Map },
     ...(user ? [{ id: 'leads', label: user.role === 'Admin' ? 'All Leads' : 'My Onboarding', icon: Users }] : []),
+    ...(user?.role === 'Admin' ? [{ id: 'admin', label: 'Admin Panel', icon: ShieldCheck }] : []),
   ];
 
   return (
@@ -111,16 +126,84 @@ export default function Navbar({
               <span className="hidden xs:inline">Quick</span> Setup
             </button>
 
-            {/* User Profile or Sign In */}
+            {/* User Profile or Sign In with Dropdown */}
             {user ? (
-              <div className="flex items-center gap-1.5 pl-1 border-l border-gray-200/60">
-                <div className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200/80 px-2.5 py-1 rounded-full transition-colors">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <span className="hidden sm:inline text-xs font-semibold text-gray-800 max-w-[90px] truncate">
-                    {user.name?.split(' ')[0]}
-                  </span>
+              <div className="flex items-center gap-1.5 pl-1 border-l border-gray-200/60" ref={dropdownRef}>
+                <div className="relative">
+                  <button
+                    onClick={() => setAuthDropdownOpen(o => !o)}
+                    className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200/80 px-2.5 py-1 rounded-full transition-colors"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <span className="hidden sm:inline text-xs font-semibold text-gray-800 max-w-[90px] truncate">
+                      {user.name?.split(' ')[0]}
+                    </span>
+                    {user.role === 'Admin' && (
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded">
+                        Admin
+                      </span>
+                    )}
+                    <ChevronDown className="w-3 h-3 text-gray-400" />
+                  </button>
+
+                  {/* Logged in Dropdown */}
+                  <AnimatePresence>
+                    {authDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-1.5 z-50 overflow-hidden"
+                      >
+                        <div className="px-3 py-2 border-b border-gray-100">
+                          <p className="text-xs font-bold text-gray-900 truncate">{user.name}</p>
+                          <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
+                          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded mt-1 inline-block">
+                            Role: {user.role}
+                          </span>
+                        </div>
+
+                        {user.role === 'Admin' && (
+                          <button
+                            onClick={() => {
+                              setActiveTab('admin');
+                              setAuthDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 transition-colors"
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            Admin Control Center
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            setActiveTab('leads');
+                            setAuthDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        >
+                          <Users className="w-3.5 h-3.5 text-gray-400" />
+                          {user.role === 'Admin' ? 'All Leads' : 'My Onboarding'}
+                        </button>
+
+                        <div className="border-t border-gray-100 my-1" />
+
+                        <button
+                          onClick={() => {
+                            setAuthDropdownOpen(false);
+                            onLogout();
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <button
@@ -132,12 +215,60 @@ export default function Navbar({
                 </button>
               </div>
             ) : (
-              <button
-                onClick={onAuthClick}
-                className="btn-primary text-xs font-bold py-1.5 px-3.5 sm:py-2 sm:px-4 rounded-full"
-              >
-                Sign In
-              </button>
+              /* Signed Out: Sign In button with Admin Dropdown */
+              <div className="relative" ref={dropdownRef}>
+                <div className="inline-flex rounded-full shadow-xs">
+                  <button
+                    onClick={onAuthClick}
+                    className="btn-primary text-xs font-bold py-1.5 pl-3.5 pr-2 sm:py-2 sm:pl-4 sm:pr-2 rounded-l-full flex items-center gap-1"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => setAuthDropdownOpen(o => !o)}
+                    className="btn-primary text-xs font-bold py-1.5 pr-2.5 pl-1 sm:py-2 sm:pr-3 sm:pl-1 rounded-r-full border-l border-emerald-400/40 hover:bg-emerald-600 transition-colors"
+                    title="Account & Admin Menu"
+                    aria-label="Account options"
+                  >
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${authDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+
+                <AnimatePresence>
+                  {authDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 py-1.5 z-50 overflow-hidden"
+                    >
+                      <button
+                        onClick={() => {
+                          setAuthDropdownOpen(false);
+                          onAuthClick();
+                        }}
+                        className="w-full text-left px-3.5 py-2.5 text-xs font-semibold text-gray-800 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                      >
+                        <User className="w-4 h-4 text-gray-400" />
+                        Sign In / Register
+                      </button>
+
+                      <div className="border-t border-gray-100 my-1" />
+
+                      <button
+                        onClick={() => {
+                          setAuthDropdownOpen(false);
+                          setActiveTab('admin');
+                        }}
+                        className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-emerald-700 hover:bg-emerald-50 flex items-center gap-2.5 transition-colors"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        Admin Panel
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
 
             {/* Mobile / Tablet Menu Toggle */}
@@ -186,7 +317,13 @@ export default function Navbar({
                 );
               })}
 
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-gray-100 space-y-2">
+                <button
+                  onClick={() => { setActiveTab('admin'); setMenuOpen(false); }}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-700"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" /> Admin Panel
+                </button>
                 <button
                   onClick={() => { onOpenOnboarding(); setMenuOpen(false); }}
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm"

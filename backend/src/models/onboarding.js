@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const onboardingSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, trim: true },
+        email: { type: String, trim: true, lowercase: true, default: '' },
+        phone: { type: String, trim: true, default: '' },
+        emailVerified: { type: Boolean, default: false },
         businessType: { type: String, default: 'Freelancer' },
         country: { type: String, default: 'India' },
         monthlyBilling: { type: String, default: '' },

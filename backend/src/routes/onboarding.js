@@ -6,14 +6,23 @@ const auth = require('../middleware/auth');
 // POST /api/onboarding - Form save hoga (user-scoped)
 router.post('/onboarding', auth, async (req, res) => {
   try {
-    const { name, businessType, country, monthlyBilling } = req.body;
+    const { name, email, phone, emailVerified, businessType, country, monthlyBilling } = req.body;
 
     if (!name) {
       return res.status(400).json({ success: false, message: 'Name is required' });
     }
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+    if (!emailVerified) {
+      return res.status(400).json({ success: false, message: 'Email must be verified via OTP before submitting' });
+    }
 
     const saved = await new Onboarding({
       name,
+      email,
+      phone,
+      emailVerified,
       businessType,
       country,
       monthlyBilling,

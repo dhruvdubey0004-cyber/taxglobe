@@ -11,6 +11,8 @@ import Toast from './components/Toast';
 import TaxBot from './components/TaxBot';
 import OnboardingModal from './components/OnboardingModal';
 import OnboardingLeads from './components/OnboardingLeads';
+import AdminPanel from './components/AdminPanel';
+import { apiFetch } from './utils';
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -22,7 +24,7 @@ export default function App() {
   // Read tab from URL hash on load, default to 'calculator'
   const getTabFromHash = () => {
     const hash = window.location.hash.replace('#', '');
-    const valid = ['home', 'calculator', 'simulator', 'treaties', 'corridors', 'leads'];
+    const valid = ['home', 'calculator', 'simulator', 'treaties', 'corridors', 'leads', 'admin'];
     return valid.includes(hash) ? hash : 'calculator';
   };
 
@@ -46,6 +48,21 @@ export default function App() {
     const onHashChange = () => setActiveTab(getTabFromHash());
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  // Auto-sync fresh role from database on load
+  useEffect(() => {
+    const token = localStorage.getItem('taxglobe_token');
+    if (!token) return;
+    apiFetch('/api/auth/me')
+      .then(res => {
+        if (res?.user) {
+          localStorage.setItem('taxglobe_user', JSON.stringify(res.user));
+          if (res.token) localStorage.setItem('taxglobe_token', res.token);
+          setUser(res.user);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const showToast = (message, type = 'success') => setToast({ message, type });
@@ -119,6 +136,16 @@ export default function App() {
                 key={`leads-comp-${userKey}`}
                 user={user}
                 onOpenOnboarding={() => setOnboardingOpen(true)}
+                onOpenAuth={() => setAuthOpen(true)}
+                showToast={showToast}
+              />
+            </motion.div>
+          )}
+          {activeTab === 'admin' && (
+            <motion.div key={`admin-${userKey}`} {...pageVariants}>
+              <AdminPanel
+                key={`admin-comp-${userKey}`}
+                user={user}
                 onOpenAuth={() => setAuthOpen(true)}
                 showToast={showToast}
               />
