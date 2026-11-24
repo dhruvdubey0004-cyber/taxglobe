@@ -10,6 +10,7 @@ import AuthModal from './components/AuthModal';
 import Toast from './components/Toast';
 import TaxBot from './components/TaxBot';
 import OnboardingModal from './components/OnboardingModal';
+import OnboardingPage from './components/OnboardingPage';
 import OnboardingLeads from './components/OnboardingLeads';
 import AdminPanel from './components/AdminPanel';
 import { apiFetch } from './utils';
@@ -21,11 +22,11 @@ const pageVariants = {
 };
 
 export default function App() {
-  // Read tab from URL hash on load, default to 'calculator'
+  // Read tab from URL hash on load, default to 'onboarding'
   const getTabFromHash = () => {
     const hash = window.location.hash.replace('#', '');
-    const valid = ['home', 'calculator', 'simulator', 'treaties', 'corridors', 'leads', 'admin'];
-    return valid.includes(hash) ? hash : 'calculator';
+    const valid = ['onboarding', 'home', 'calculator', 'simulator', 'treaties', 'corridors', 'admin'];
+    return valid.includes(hash) ? hash : 'onboarding';
   };
 
   const [activeTab, setActiveTab] = useState(getTabFromHash);
@@ -41,7 +42,16 @@ export default function App() {
   function changeTab(tab) {
     setActiveTab(tab);
     window.location.hash = tab;
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
+
+  // Scroll restoration & scroll to top on mount
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, []);
 
   // On browser back/forward button
   useEffect(() => {
@@ -92,7 +102,7 @@ export default function App() {
   const userKey = user?._id || user?.id || 'guest';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden w-full">
       <Navbar
         activeTab={activeTab}
         setActiveTab={changeTab}
@@ -107,7 +117,16 @@ export default function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div key="home" {...pageVariants}>
-              <HeroSection onGetStarted={changeTab} onOpenOnboarding={() => setOnboardingOpen(true)} />
+              <HeroSection onGetStarted={changeTab} onOpenOnboarding={() => changeTab('onboarding')} />
+            </motion.div>
+          )}
+          {activeTab === 'onboarding' && (
+            <motion.div key={`onboarding-${userKey}`} {...pageVariants}>
+              <OnboardingPage
+                onNavigateTab={changeTab}
+                showToast={showToast}
+                user={user}
+              />
             </motion.div>
           )}
           {activeTab === 'calculator' && (
@@ -130,17 +149,6 @@ export default function App() {
               <CorridorMaps />
             </motion.div>
           )}
-          {activeTab === 'leads' && (
-            <motion.div key={`leads-${userKey}`} {...pageVariants}>
-              <OnboardingLeads
-                key={`leads-comp-${userKey}`}
-                user={user}
-                onOpenOnboarding={() => setOnboardingOpen(true)}
-                onOpenAuth={() => setAuthOpen(true)}
-                showToast={showToast}
-              />
-            </motion.div>
-          )}
           {activeTab === 'admin' && (
             <motion.div key={`admin-${userKey}`} {...pageVariants}>
               <AdminPanel
@@ -155,17 +163,17 @@ export default function App() {
       </main>
 
       {/* Global Disclaimer Footer */}
-      <footer className="glass border-t border-white/80 mt-auto py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex items-center gap-2">
+      <footer className="glass border-t border-white/80 mt-auto py-6 px-3 sm:px-4 max-w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2">
             <span className="font-bold text-gray-900 text-sm">TaxGlobe</span>
             <span className="text-gray-300">·</span>
             <span className="text-xs text-gray-500">Cross-Border Tax & Structure Optimization</span>
           </div>
 
-          <div className="inline-flex items-center gap-2 bg-amber-50/90 border border-amber-200/80 rounded-full px-4 py-1.5 text-xs text-amber-800 font-medium shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            For Educational / Demo Purpose Only - Not Legal Tax Advice
+          <div className="inline-flex items-center gap-2 bg-amber-50/90 border border-amber-200/80 rounded-2xl sm:rounded-full px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs text-amber-800 font-medium shadow-xs text-center max-w-full leading-tight">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <span>For Educational / Demo Purpose Only - Not Legal Tax Advice</span>
           </div>
 
           <p className="text-xs text-gray-400">

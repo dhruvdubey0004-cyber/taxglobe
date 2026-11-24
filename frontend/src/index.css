@@ -3,12 +3,25 @@
 @tailwind utilities;
 
 @layer base {
-  * { box-sizing: border-box; }
-  body {
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-text-size-adjust: 100%;
     font-family: 'Inter', system-ui, sans-serif;
     background: linear-gradient(135deg, #f0fdf4 0%, #f0fdfa 50%, #ecfdf5 100%);
     min-height: 100vh;
     color: #111827;
+  }
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    min-height: 100vh;
   }
 }
 
@@ -42,7 +55,13 @@
     @apply bg-white hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
   }
   .input-field {
-    @apply w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-200 placeholder-gray-400;
+    @apply w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-2.5 text-base sm:text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all duration-200 placeholder-gray-400;
+    font-size: 16px; /* Prevents auto-zoom on mobile inputs */
+  }
+  @media (min-width: 640px) {
+    .input-field {
+      font-size: 0.875rem; /* 14px on desktop */
+    }
   }
   .label-sm {
     @apply block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5;

@@ -61,7 +61,7 @@ export default function HeroSection({ onGetStarted, onOpenOnboarding }) {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            <button onClick={onOpenOnboarding} className="btn-primary flex items-center gap-2 text-sm sm:text-base">
+            <button onClick={() => onGetStarted('onboarding')} className="btn-primary flex items-center gap-2 text-sm sm:text-base">
               <Sparkles className="w-4 h-4" /> Start Onboarding Setup
             </button>
             <button onClick={() => onGetStarted('calculator')} className="btn-secondary flex items-center gap-2 text-sm sm:text-base">

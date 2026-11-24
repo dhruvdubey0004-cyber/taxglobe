@@ -35,20 +35,14 @@ router.post('/onboarding', auth, async (req, res) => {
   }
 });
 
-// GET /api/onboarding - Only current user's onboarding leads (or all if Admin)
+// GET /api/onboarding - Only Admin can view leads
 router.get('/onboarding', auth, async (req, res) => {
   try {
-    if (!req.user) {
-      // Logged out / guest users cannot view private user leads
-      return res.json({ success: true, count: 0, data: [] });
+    if (!req.user || req.user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: 'Access denied: Admin only' });
     }
 
-    let filter = { userId: req.user.id };
-    if (req.user.role === 'Admin') {
-      filter = {}; // Admin can see all leads
-    }
-
-    const all = await Onboarding.find(filter).sort({ createdAt: -1 });
+    const all = await Onboarding.find().sort({ createdAt: -1 });
     res.json({ success: true, count: all.length, data: all });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
