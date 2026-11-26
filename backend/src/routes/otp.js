@@ -30,49 +30,72 @@ router.post('/send', async (req, res) => {
     if (smtpConfigured) {
       try {
         const nodemailer = require('nodemailer');
-        const transporter = nodemailer.createTransport({
+        const transportOpts = (process.env.SMTP_HOST && process.env.SMTP_PORT) ? {
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT),
+          secure: Number(process.env.SMTP_PORT) === 465,
+          auth: {
+            user: process.env.SMTP_EMAIL,
+            pass: process.env.SMTP_PASSWORD,
+          },
+        } : {
           service: 'gmail',
           auth: {
             user: process.env.SMTP_EMAIL,
             pass: process.env.SMTP_PASSWORD,
           },
-        });
+        };
+
+        const transporter = nodemailer.createTransport(transportOpts);
 
         await transporter.sendMail({
           from: `"TaxGlobe" <${process.env.SMTP_EMAIL}>`,
           to: email,
           subject: 'Your TaxGlobe Verification OTP',
           html: `
-            <div style="font-family: 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9fafb; border-radius: 16px;">
-              <h2 style="color: #111827; margin-bottom: 8px;">TaxGlobe Verification</h2>
-              <p style="color: #6b7280; font-size: 14px;">Use the OTP below to verify your email address:</p>
+            <div style="font-family: 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f9fafb; border-radius: 16px; border: 1px solid #e5e7eb;">
+              <h2 style="color: #111827; margin-bottom: 8px;">TaxGlobe Email Verification</h2>
+              <p style="color: #4b5563; font-size: 14px; line-height: 1.5;">Use the 6-digit OTP below to verify your email address and continue your cross-border tax setup:</p>
               <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
                 <span style="font-size: 32px; font-weight: 800; letter-spacing: 10px; color: #059669;">${otp}</span>
               </div>
-              <p style="color: #9ca3af; font-size: 12px;">This OTP is valid for 5 minutes. Do not share it with anyone.</p>
+              <p style="color: #6b7280; font-size: 13px;">This OTP is valid for <strong>5 minutes</strong>.</p>
+              <p style="color: #9ca3af; font-size: 12px; margin-top: 16px;">If you did not request this, please ignore this email.</p>
             </div>
           `,
         });
 
         console.log(`✅ OTP email sent to ${email}`);
+        return res.json({
+          success: true,
+          message: 'OTP sent to your email successfully. Please check your inbox.',
+        });
       } catch (mailErr) {
-        console.warn('⚠️ Email send failed, falling back to console:', mailErr.message);
-        console.log(`📧 OTP for ${email}: ${otp}`);
+        console.error('⚠️ Nodemailer send failed:', mailErr.message);
+        return res.status(500).json({
+          success: false,
+          message: `Failed to deliver OTP to email: ${mailErr.message}`,
+        });
       }
     } else {
-      // No SMTP configured — log OTP to console for development
-      console.log(`\n📧 ===== DEV MODE OTP (SMTP NOT CONFIGURED) =====`);
-      console.log(`   Email: ${email}`);
-      console.log(`   OTP:   ${otp}`);
-      console.log(`   Tip:   Add SMTP_EMAIL and SMTP_PASSWORD to backend/.env to send real emails`);
-      console.log(`   ===============================================\n`);
-    }
+      // No SMTP configured
+      console.warn(`\n⚠️ SMTP NOT CONFIGURED: SMTP_EMAIL and SMTP_PASSWORD are not set in environment variables.`);
+      console.log(`   Email: ${email} | OTP: ${otp}\n`);
 
-    res.json({
-      success: true,
-      message: smtpConfigured ? 'OTP sent to your email successfully' : 'OTP generated (Dev Mode)',
-      devOtp: !smtpConfigured ? otp : undefined,
-    });
+      const isDev = process.env.NODE_ENV !== 'production' && !process.env.VERCEL;
+      if (isDev) {
+        return res.json({
+          success: true,
+          message: 'OTP generated (Dev Mode: SMTP not configured)',
+          devOtp: otp,
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: 'SMTP credentials missing on server. Please add SMTP_EMAIL and SMTP_PASSWORD in Vercel settings.',
+      });
+    }
   } catch (err) {
     console.error('OTP send error:', err);
     res.status(500).json({ success: false, message: err.message });

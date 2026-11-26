@@ -88,12 +88,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, showToast
       if (res.success) {
         setOtpSent(true);
         setOtpCooldown(60); // 60 seconds cooldown for resend
-        if (res.devOtp) {
-          setOtpValue(res.devOtp);
-          showToast(`Dev OTP: ${res.devOtp} (Auto-filled)`, 'info');
-        } else {
-          showToast('OTP sent to your email!', 'success');
-        }
+        showToast('OTP sent to your email! Please check your inbox.', 'success');
       }
     } catch (err) {
       setOtpError(err.message || 'Failed to send OTP');

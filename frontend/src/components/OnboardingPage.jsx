@@ -119,12 +119,7 @@ export default function OnboardingPage({ onNavigateTab, showToast, user }) {
       if (res.success) {
         setOtpSent(true);
         setOtpCooldown(60);
-        if (res.devOtp) {
-          setOtpValue(res.devOtp);
-          showToast?.(`Dev OTP: ${res.devOtp} (Auto-filled)`, 'info');
-        } else {
-          showToast?.('OTP sent to your email!', 'success');
-        }
+        showToast?.('OTP sent to your email! Please check your inbox.', 'success');
       }
     } catch (err) {
       setOtpError(err.message || 'Failed to send OTP');
