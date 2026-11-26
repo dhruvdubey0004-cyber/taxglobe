@@ -25,7 +25,7 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
     name: '',
     email: '',
     password: '',
-    role: 'Founder',
+    role: 'User',
   });
   const [creatingUser, setCreatingUser] = useState(false);
 
@@ -123,7 +123,7 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
         showToast?.(`User "${res.data.name}" added successfully!`, 'success');
         setUsersList(prev => [res.data, ...prev]);
         setShowAddUserModal(false);
-        setNewUserForm({ name: '', email: '', password: '', role: 'Founder' });
+        setNewUserForm({ name: '', email: '', password: '', role: 'User' });
       }
     } catch (err) {
       showToast?.(err.message || 'Failed to add user', 'error');
@@ -291,7 +291,7 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
                 <Users className="w-4 h-4 text-emerald-600" /> Users Role Distribution
               </h3>
               <div className="space-y-2">
-                {['Admin', 'CA', 'Founder'].map(role => {
+                {['Admin', 'CA', 'Founder', 'User'].map(role => {
                   const count = usersList.filter(u => u.role === role).length;
                   const pct = usersList.length ? Math.round((count / usersList.length) * 100) : 0;
                   return (
@@ -395,10 +395,11 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
                       <td className="py-3 px-3 text-gray-600 font-mono">{u.email}</td>
                       <td className="py-3 px-3">
                         <select
-                          value={u.role}
+                          value={u.role || 'User'}
                           onChange={e => handleRoleChange(u._id, e.target.value)}
                           className="text-xs bg-white border border-gray-200 rounded-lg px-2 py-1 font-semibold text-gray-700"
                         >
+                          <option value="User">User</option>
                           <option value="Founder">Founder</option>
                           <option value="CA">CA</option>
                           <option value="Admin">Admin</option>
@@ -723,7 +724,8 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
                     onChange={e => setNewUserForm(f => ({ ...f, role: e.target.value }))}
                     className="input-field py-2.5 text-xs sm:text-sm font-semibold"
                   >
-                    <option value="Founder">Founder (Standard - DTAA & HoldCo Tools)</option>
+                    <option value="User">User (Default - Standard Access)</option>
+                    <option value="Founder">Founder (DTAA & HoldCo Tools)</option>
                     <option value="CA">CA (Chartered Accountant - Advisory Access)</option>
                     <option value="Admin">Admin (Full Access - Central Dashboard & Leads)</option>
                   </select>

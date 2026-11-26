@@ -22,7 +22,7 @@ export default function AuthModal({ onClose, onLogin, showToast }) {
       if (mode === 'register') {
         await apiFetch('/api/auth/register', {
           method: 'POST',
-          body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: 'Founder' }),
+          body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: 'User' }),
         });
         showToast('Account created! Please log in.', 'success');
         setMode('login');

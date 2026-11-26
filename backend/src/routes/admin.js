@@ -75,8 +75,8 @@ router.post('/users', auth, requireAdmin, async (req, res) => {
       return res.status(400).json({ success: false, message: 'User with this email already exists' });
     }
 
-    const validRoles = ['Founder', 'CA', 'Admin'];
-    const userRole = validRoles.includes(role) ? role : 'Founder';
+    const validRoles = ['User', 'Founder', 'CA', 'Admin'];
+    const userRole = validRoles.includes(role) ? role : 'User';
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
@@ -101,7 +101,7 @@ router.post('/users', auth, requireAdmin, async (req, res) => {
 
 router.patch('/users/:id/role', auth, requireAdmin, async (req, res) => {
   const { role } = req.body;
-  if (!['Founder', 'CA', 'Admin'].includes(role)) {
+  if (!['User', 'Founder', 'CA', 'Admin'].includes(role)) {
     return res.status(400).json({ success: false, message: 'Invalid role' });
   }
   const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select('-password');
