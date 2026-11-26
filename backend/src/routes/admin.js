@@ -1,6 +1,7 @@
 // backend/src/routes/admin.js
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const auth = require('../middleware/auth');
 const User = require('../models/user');
 const Onboarding = require('../models/onboarding');
@@ -58,6 +59,44 @@ router.get('/stats', auth, requireAdmin, async (req, res) => {
 router.get('/users', auth, requireAdmin, async (req, res) => {
   const users = await User.find().select('-password').sort({ createdAt: -1 });
   res.json({ success: true, data: users });
+});
+
+// POST /api/admin/users — Create a new user
+router.post('/users', auth, requireAdmin, async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const existing = await User.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'User with this email already exists' });
+    }
+
+    const validRoles = ['Founder', 'CA', 'Admin'];
+    const userRole = validRoles.includes(role) ? role : 'Founder';
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      name: name.trim(),
+      email: cleanEmail,
+      password: hashedPassword,
+      role: userRole,
+    });
+
+    const userObj = newUser.toObject();
+    delete userObj.password;
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: userObj,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 router.patch('/users/:id/role', auth, requireAdmin, async (req, res) => {

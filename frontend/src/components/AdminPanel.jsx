@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, Users, FileText, KeyRound, Globe, Layers,
   Trash2, RefreshCw, Search, CheckCircle2, XCircle, AlertTriangle,
-  Lock, TrendingUp, Filter, Phone, Mail, ChevronRight, Shield
+  Lock, TrendingUp, Filter, Phone, Mail, ChevronRight, Shield,
+  UserPlus, Plus, X, Loader2
 } from 'lucide-react';
 import { apiFetch, formatCurrency } from '../utils';
 
@@ -17,6 +18,16 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
   const [simulationList, setSimulationList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Add User Modal State
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUserForm, setNewUserForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'Founder',
+  });
+  const [creatingUser, setCreatingUser] = useState(false);
 
   const isAdmin = user && user.role === 'Admin';
 
@@ -89,6 +100,35 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
       setUsersList(prev => prev.filter(u => u._id !== userId));
     } catch (err) {
       showToast?.(`Delete failed: ${err.message}`, 'error');
+    }
+  }
+
+  async function handleCreateUser(e) {
+    e.preventDefault();
+    if (!newUserForm.name.trim() || !newUserForm.email.trim() || !newUserForm.password) {
+      showToast?.('Please fill in name, email, and password', 'error');
+      return;
+    }
+    if (newUserForm.password.length < 6) {
+      showToast?.('Password must be at least 6 characters', 'error');
+      return;
+    }
+    setCreatingUser(true);
+    try {
+      const res = await apiFetch('/api/admin/users', {
+        method: 'POST',
+        body: JSON.stringify(newUserForm),
+      });
+      if (res.success) {
+        showToast?.(`User "${res.data.name}" added successfully!`, 'success');
+        setUsersList(prev => [res.data, ...prev]);
+        setShowAddUserModal(false);
+        setNewUserForm({ name: '', email: '', password: '', role: 'Founder' });
+      }
+    } catch (err) {
+      showToast?.(err.message || 'Failed to add user', 'error');
+    } finally {
+      setCreatingUser(false);
     }
   }
 
@@ -303,15 +343,24 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
               <h3 className="text-lg font-bold text-gray-900">Registered Users</h3>
               <p className="text-xs text-gray-500">Manage user roles and platform access credentials.</p>
             </div>
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="input-field pl-9 py-2 text-xs w-64"
-              />
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="input-field pl-9 py-2 text-xs w-48 sm:w-60"
+                />
+              </div>
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className="btn-primary py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Add User</span>
+              </button>
             </div>
           </div>
 
@@ -602,6 +651,115 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
           </div>
         </div>
       )}
+
+      {/* ADD USER MODAL */}
+      <AnimatePresence>
+        {showAddUserModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-gray-100 relative"
+            >
+              <button
+                onClick={() => setShowAddUserModal(false)}
+                className="absolute top-5 right-5 p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Add New User</h3>
+                  <p className="text-xs text-gray-500">Create an account with assigned privileges.</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <label className="label-sm">Full Name / Entity Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Rajesh Kumar or Acme Tech"
+                    value={newUserForm.name}
+                    onChange={e => setNewUserForm(f => ({ ...f, name: e.target.value }))}
+                    className="input-field py-2.5 text-xs sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="label-sm">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="user@example.com"
+                    value={newUserForm.email}
+                    onChange={e => setNewUserForm(f => ({ ...f, email: e.target.value }))}
+                    className="input-field py-2.5 text-xs sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="label-sm">Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Minimum 6 characters"
+                    value={newUserForm.password}
+                    onChange={e => setNewUserForm(f => ({ ...f, password: e.target.value }))}
+                    className="input-field py-2.5 text-xs sm:text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="label-sm">Role & Privileges *</label>
+                  <select
+                    value={newUserForm.role}
+                    onChange={e => setNewUserForm(f => ({ ...f, role: e.target.value }))}
+                    className="input-field py-2.5 text-xs sm:text-sm font-semibold"
+                  >
+                    <option value="Founder">Founder (Standard - DTAA & HoldCo Tools)</option>
+                    <option value="CA">CA (Chartered Accountant - Advisory Access)</option>
+                    <option value="Admin">Admin (Full Access - Central Dashboard & Leads)</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddUserModal(false)}
+                    className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creatingUser}
+                    className="btn-primary py-2 px-5 text-xs flex items-center gap-1.5 shadow-sm"
+                  >
+                    {creatingUser ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>Create User</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
