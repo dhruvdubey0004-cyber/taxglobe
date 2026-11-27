@@ -135,15 +135,61 @@ router.delete('/otps/:id', auth, requireAdmin, async (req, res) => {
   res.json({ success: true, message: 'OTP entry removed' });
 });
 
-// ── READ‑ONLY DATA: TREATIES & SIMULATIONS ────────────────────────
+// ── DATA: TREATIES & SIMULATIONS ────────────────────────
 router.get('/treaties', auth, requireAdmin, async (req, res) => {
-  const treaties = await Treaty.find().sort({ createdAt: -1 });
-  res.json({ success: true, data: treaties });
+  const treaties = await Treaty.find().sort({ from_country: 1, to_country: 1, income_type: 1 });
+  const formatted = treaties.map(t => {
+    const doc = t.toObject ? t.toObject() : t;
+    return {
+      _id: doc._id,
+      from_country: doc.from_country,
+      to_country: doc.to_country,
+      from: doc.from_country,
+      to: doc.to_country,
+      income_type: doc.income_type,
+      incomeType: doc.income_type,
+      article_no: doc.article_no,
+      article: doc.article_no,
+      wht_rate: doc.wht_rate,
+      treatyRate: doc.wht_rate,
+      domestic_rate: doc.domestic_rate,
+      domesticRate: doc.domestic_rate,
+      source_reference: doc.source_reference,
+      status: doc.status || 'Active',
+      createdAt: doc.createdAt
+    };
+  });
+  res.json({ success: true, data: formatted });
+});
+
+router.delete('/treaties/:id', auth, requireAdmin, async (req, res) => {
+  await Treaty.findByIdAndDelete(req.params.id);
+  res.json({ success: true, message: 'Treaty entry removed' });
 });
 
 router.get('/simulations', auth, requireAdmin, async (req, res) => {
   const sims = await Simulation.find().sort({ createdAt: -1 });
-  res.json({ success: true, data: sims });
+  const formatted = sims.map(s => {
+    const doc = s.toObject ? s.toObject() : s;
+    const from = doc.inputs?.from_country || doc.inputs?.from || 'IN';
+    const to = doc.inputs?.to_country || doc.inputs?.to || 'Global';
+    const incomeType = doc.inputs?.income_type || doc.inputs?.incomeType || 'Cross-Border';
+    const savings = doc.output?.savings ?? doc.output?.domesticTax ?? 0;
+    const amount = doc.inputs?.amount ?? doc.inputs?.gross_income ?? doc.output?.amount ?? 0;
+    return {
+      _id: doc._id,
+      corridor: `${from} ➔ ${to}`,
+      from,
+      to,
+      incomeType,
+      structureType: incomeType,
+      amount,
+      savings,
+      totalSavings: savings,
+      createdAt: doc.createdAt
+    };
+  });
+  res.json({ success: true, data: formatted });
 });
 
 module.exports = router;

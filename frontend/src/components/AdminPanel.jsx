@@ -8,6 +8,25 @@ import {
 } from 'lucide-react';
 import { apiFetch, formatCurrency } from '../utils';
 
+const COUNTRY_LOOKUP = {
+  IN: { name: 'India', flag: '🇮🇳' },
+  US: { name: 'United States', flag: '🇺🇸' },
+  SG: { name: 'Singapore', flag: '🇸🇬' },
+  UAE: { name: 'UAE', flag: '🇦🇪' },
+  AE: { name: 'UAE', flag: '🇦🇪' },
+  UK: { name: 'United Kingdom', flag: '🇬🇧' },
+  GB: { name: 'United Kingdom', flag: '🇬🇧' },
+  DE: { name: 'Germany', flag: '🇩🇪' },
+  CA: { name: 'Canada', flag: '🇨🇦' },
+  AU: { name: 'Australia', flag: '🇦🇺' },
+};
+
+function getCountryDetails(code) {
+  if (!code) return { name: 'Global', flag: '🌐' };
+  const up = String(code).toUpperCase().trim();
+  return COUNTRY_LOOKUP[up] || { name: code, flag: '🌐' };
+}
+
 export default function AdminPanel({ user, onOpenAuth, showToast }) {
   const [activeSubTab, setActiveSubTab] = useState('overview');
   const [stats, setStats] = useState(null);
@@ -148,6 +167,17 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
       await apiFetch(`/api/admin/otps/${id}`, { method: 'DELETE' });
       showToast?.('OTP entry removed', 'success');
       setOtpList(prev => prev.filter(o => o._id !== id));
+    } catch (err) {
+      showToast?.(`Delete failed: ${err.message}`, 'error');
+    }
+  }
+
+  async function handleDeleteTreaty(id) {
+    if (!window.confirm('Delete this treaty configuration?')) return;
+    try {
+      await apiFetch(`/api/admin/treaties/${id}`, { method: 'DELETE' });
+      showToast?.('Treaty removed', 'success');
+      setTreatyList(prev => prev.filter(t => t._id !== id));
     } catch (err) {
       showToast?.(`Delete failed: ${err.message}`, 'error');
     }
@@ -584,36 +614,98 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
       {/* 5. TREATIES TAB */}
       {activeSubTab === 'treaties' && (
         <div className="glass rounded-3xl p-6 border border-white/80 shadow-xl space-y-4">
-          <h3 className="text-lg font-bold text-gray-900">Configured DTAA Treaties</h3>
-          <p className="text-xs text-gray-500">Treaty rules stored in MongoDB for withholding tax exemptions.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Configured DTAA Treaties ({treatyList.length})</h3>
+              <p className="text-xs text-gray-500">Treaty rules stored in MongoDB for withholding tax exemptions.</p>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search treaties by country or income type..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="input-field pl-9 py-2 text-xs w-64"
+              />
+            </div>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {treatyList.map(t => (
-              <div key={t._id} className="p-4 rounded-2xl bg-white/70 border border-gray-200/80 shadow-sm space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-sm text-gray-900">
-                    {t.countryA} ↔ {t.countryB}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {treatyList
+              .filter(t => {
+                if (!searchQuery) return true;
+                const q = searchQuery.toLowerCase();
+                const from = (t.from_country || t.from || '').toLowerCase();
+                const to = (t.to_country || t.to || '').toLowerCase();
+                const income = (t.income_type || t.incomeType || '').toLowerCase();
+                const art = (t.article_no || t.article || '').toLowerCase();
+                const ref = (t.source_reference || '').toLowerCase();
+                return from.includes(q) || to.includes(q) || income.includes(q) || art.includes(q) || ref.includes(q);
+              })
+              .map(t => {
+                const fromCode = (t.from_country || t.from || 'IN').toUpperCase();
+                const toCode = (t.to_country || t.to || '').toUpperCase();
+                const fromC = getCountryDetails(fromCode);
+                const toC = getCountryDetails(toCode);
+                const income = t.income_type || t.incomeType || 'Royalty';
+                const article = t.article_no || t.article || 'DTAA Clause';
+                const wht = t.wht_rate ?? t.treatyRate ?? 0;
+                const domestic = t.domestic_rate ?? t.domesticRate ?? 20;
+                const savings = Math.max(0, domestic - wht);
+
+                return (
+                  <div key={t._id} className="p-4 rounded-2xl bg-white/90 border border-gray-200/80 shadow-sm space-y-3 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-extrabold text-sm text-gray-900 flex items-center gap-1.5">
+                        <span>{fromC.flag} {fromCode}</span>
+                        <span className="text-gray-400 font-normal">➔</span>
+                        <span>{toC.flag} {toCode}</span>
+                      </div>
+                      <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                        {t.status || 'Active'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold border border-blue-100 text-[11px]">
+                        {income}
+                      </span>
+                      <span className="text-gray-500 font-mono text-[11px] font-semibold bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                        {article}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 text-xs pt-2.5 border-t border-gray-100 text-center">
+                      <div className="bg-emerald-50/60 p-1.5 rounded-xl border border-emerald-100/60">
+                        <span className="text-gray-500 text-[10px] block font-medium">Treaty WHT</span>
+                        <span className="font-black text-emerald-700 text-sm">{wht}%</span>
+                      </div>
+                      <div className="bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+                        <span className="text-gray-500 text-[10px] block font-medium">Domestic</span>
+                        <span className="font-bold text-gray-600 text-sm">{domestic}%</span>
+                      </div>
+                      <div className="bg-teal-50/60 p-1.5 rounded-xl border border-teal-100/60">
+                        <span className="text-teal-700 text-[10px] block font-medium">Tax Saved</span>
+                        <span className="font-black text-teal-800 text-sm">+{savings}%</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 text-[11px] text-gray-400">
+                      <span className="truncate max-w-[170px]" title={t.source_reference || `${fromCode}-${toCode} DTAA`}>
+                        {t.source_reference || `${fromCode}-${toCode} DTAA`}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteTreaty(t._id)}
+                        className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                        title="Delete Treaty"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
-                    Active
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-xs pt-2 border-t border-gray-100">
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">Royalty</span>
-                    <span className="font-bold text-gray-800">{t.royaltyRate}%</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">FTS</span>
-                    <span className="font-bold text-gray-800">{t.ftsRate}%</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-[10px] block">Dividends</span>
-                    <span className="font-bold text-gray-800">{t.dividendRate}%</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
           </div>
         </div>
       )}
@@ -621,32 +713,81 @@ export default function AdminPanel({ user, onOpenAuth, showToast }) {
       {/* 6. SIMULATIONS TAB */}
       {activeSubTab === 'simulations' && (
         <div className="glass rounded-3xl p-6 border border-white/80 shadow-xl space-y-4">
-          <h3 className="text-lg font-bold text-gray-900">User Structure Simulations</h3>
-          <p className="text-xs text-gray-500">HoldCo & cross-border structure calculations executed by users.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">User Structure Simulations ({simulationList.length})</h3>
+              <p className="text-xs text-gray-500">HoldCo & cross-border structure calculations executed by users.</p>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search simulations..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="input-field pl-9 py-2 text-xs w-64"
+              />
+            </div>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-gray-200/80 text-gray-500 uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-3">Structure / Corridor</th>
-                  <th className="py-3 px-3">Entity Type</th>
+                  <th className="py-3 px-3">Corridor</th>
+                  <th className="py-3 px-3">Income Type</th>
                   <th className="py-3 px-3">Estimated Savings</th>
                   <th className="py-3 px-3">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {simulationList.map(s => (
-                  <tr key={s._id} className="hover:bg-gray-50/60 transition-colors">
-                    <td className="py-3 px-3 font-bold text-gray-900">{s.corridor || 'Global'}</td>
-                    <td className="py-3 px-3 text-gray-700">{s.structureType || 'HoldCo'}</td>
-                    <td className="py-3 px-3 font-semibold text-emerald-700">
-                      {s.totalSavings ? formatCurrency(s.totalSavings) : 'Calculated'}
-                    </td>
-                    <td className="py-3 px-3 text-gray-400">
-                      {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '—'}
-                    </td>
-                  </tr>
-                ))}
+                {simulationList
+                  .filter(s => {
+                    if (!searchQuery) return true;
+                    const q = searchQuery.toLowerCase();
+                    const corridor = (s.corridor || '').toLowerCase();
+                    const income = (s.incomeType || s.structureType || '').toLowerCase();
+                    return corridor.includes(q) || income.includes(q);
+                  })
+                  .map(s => {
+                    const fromCode = (s.from || s.inputs?.from_country || s.inputs?.from || 'IN').toUpperCase();
+                    const toCode = (s.to || s.inputs?.to_country || s.inputs?.to || 'Global').toUpperCase();
+                    const fromC = getCountryDetails(fromCode);
+                    const toC = getCountryDetails(toCode);
+                    const income = s.incomeType || s.inputs?.income_type || s.structureType || 'Royalty';
+                    const savings = s.savings ?? s.totalSavings ?? s.output?.savings ?? 0;
+                    const amount = s.amount ?? s.inputs?.amount ?? s.inputs?.gross_income ?? 0;
+
+                    return (
+                      <tr key={s._id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-3 px-3 font-bold text-gray-900">
+                          <span className="inline-flex items-center gap-1.5">
+                            <span>{fromC.flag} {fromCode}</span>
+                            <span className="text-gray-400">➔</span>
+                            <span>{toC.flag} {toCode}</span>
+                          </span>
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 font-bold text-[11px] border border-blue-100">
+                            {income}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="font-bold text-emerald-700 text-sm">
+                            {formatCurrency(savings)}
+                          </span>
+                          {amount > 0 && (
+                            <span className="text-[10px] text-gray-400 block font-mono">
+                              on {formatCurrency(amount)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-3 text-gray-400">
+                          {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
