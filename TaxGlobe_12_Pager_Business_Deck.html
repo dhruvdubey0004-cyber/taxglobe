@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaxGlobe — 12-Page Project Business Deck</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- html2pdf.js for 1-Click PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #090d16;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* SLIDE CONTAINER (16:9 / Landscape Presentation Format) */
+    .slide-page {
+      width: 100%;
+      max-width: 1160px;
+      min-height: 680px;
+      margin: 28px auto;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      padding: 44px 52px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* Subtle background grid pattern */
+    .bg-grid {
+      background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    /* Print settings for high-res landscape PDF */
+    @media print {
+      body { background: #ffffff !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .slide-page {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        padding: 40px 48px !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+    }
+
+    .badge-glow {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body class="py-6 px-4 md:px-8">
+
+  <!-- ================= TOP CONTROL BAR (NO-PRINT) ================= -->
+  <header class="max-w-[1160px] mx-auto mb-6 bg-slate-900/90 backdrop-blur-md p-4 px-6 rounded-2xl border border-slate-700/80 text-white flex flex-wrap items-center justify-between gap-4 no-print shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-slate-950 text-lg shadow-lg shadow-emerald-500/20">
+        🌐
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm md:text-base font-extrabold tracking-tight">TaxGlobe — 12-Pager Business Deck</h1>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">v2.4 Final</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Assigned Project Submission for Higher Authority (~Rajesh Kumar) | Lead: Dhruv Dubey</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2.5">
+      <!-- Direct PDF Download Button -->
+      <button id="downloadPdfBtn" onclick="downloadPDF()" class="px-4 py-2 text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl flex items-center gap-2 transition duration-200 shadow-md shadow-emerald-500/20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Download PDF</span>
+      </button>
+
+      <!-- Native Print / Save Dialog Button -->
+      <button onclick="window.print()" class="px-3.5 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-600 flex items-center gap-1.5 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span>Print View</span>
+      </button>
+
+      <!-- Live App Link -->
+      <a href="https://taxglobe-oowe.vercel.app" target="_blank" class="px-3.5 py-2 text-xs font-semibold bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 rounded-xl border border-blue-500/40 flex items-center gap-1.5 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        <span>Live App</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- DECK CONTAINER WRAPPER FOR PDF GENERATION -->
+  <div id="deckContent">
+
+    <!-- ================= SLIDE 1: COVER & EXECUTIVE VISION ================= -->
+    <section class="slide-page bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white relative">
+      <!-- Background glowing gradient orb -->
+      <div class="absolute -right-20 -top-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Header -->
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4 relative z-10">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-emerald-500/30">
+            🌐
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-black tracking-tight text-white">TaxGlobe</span>
+              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">DTAA Engine</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Cross-Border Tax Optimization & Entity Structuring Platform</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-xs font-mono font-bold text-slate-500">PAGE 01 / 12</span>
+          <span class="block text-[10px] text-emerald-400 font-semibold">PROJECT BUSINESS DECK</span>
+        </div>
+      </div>
+
+      <!-- Hero Body -->
+      <div class="my-auto py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-4 badge-glow">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Solving $4.2B International Withholding Tax Leakage
+          </div>
+          <h1 class="text-3xl md:text-5xl font-black tracking-tight leading-[1.15] mb-4 text-white">
+            Stop Losing <span class="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">20% to 30%</span> of Global Revenue to Foreign Taxes.
+          </h1>
+          <p class="text-sm md:text-base text-slate-300 leading-relaxed max-w-xl mb-6">
+            India's premier bilateral tax treaty optimization engine. We legally slash foreign client Withholding Tax (WHT) from 30% down to 0%–10% and model offshore parent HoldCo structures for SaaS, IT consultancies, and digital exporters.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 text-xs">
+            <div class="px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span class="text-slate-400">Project Lead:</span>
+              <span class="font-bold text-white">Dhruv Dubey</span>
+            </div>
+            <div class="px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span class="text-slate-400">Reviewing Authority:</span>
+              <span class="font-bold text-white">~Rajesh Kumar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphic Visual: Corridors Card -->
+        <div class="lg:col-span-5">
+          <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-4">
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Bilateral Tax Impact Simulator
+              </span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">SEC 90 DTAA</span>
+            </div>
+
+            <!-- Visual Flow Diagram SVG -->
+            <svg class="w-full h-32" viewBox="0 0 360 130" fill="none">
+              <!-- Node 1: US Client -->
+              <rect x="10" y="35" width="95" height="55" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+              <text x="57" y="58" fill="#94a3b8" font-size="10" font-family="'Plus Jakarta Sans'" text-anchor="middle" font-weight="600">US Enterprise</text>
+              <text x="57" y="74" fill="#f8fafc" font-size="11" font-family="'JetBrains Mono'" text-anchor="middle" font-weight="700">$100,000</text>
+
+              <!-- Connection Arrow -->
+              <path d="M105 62 H 145" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 3"/>
+              
+              <!-- Red WHT Badge -->
+              <circle cx="150" cy="62" r="16" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="150" y="66" fill="#fca5a5" font-size="9" font-family="'JetBrains Mono'" text-anchor="middle" font-weight="700">-30%</text>
+
+              <!-- TaxGlobe Engine -->
+              <path d="M150 46 V 20 H 220" stroke="#10b981" stroke-width="1.5"/>
+              <rect x="190" y="10" width="85" height="24" rx="6" fill="#065f46" stroke="#10b981" stroke-width="1"/>
+              <text x="232" y="26" fill="#6ee7b7" font-size="9" font-family="'Plus Jakarta Sans'" text-anchor="middle" font-weight="700">TaxGlobe Relief</text>
+
+              <!-- Connection Arrow to Result -->
+              <path d="M166 62 H 245" stroke="#10b981" stroke-width="2"/>
+              <polygon points="245,59 252,62 245,65" fill="#10b981"/>
+
+              <!-- Node 2: India Founder -->
+              <rect x="252" y="35" width="98" height="55" rx="10" fill="#064e3b" stroke="#059669" stroke-width="1.5"/>
+              <text x="301" y="58" fill="#6ee7b7" font-size="10" font-family="'Plus Jakarta Sans'" text-anchor="middle" font-weight="600">India Remitted</text>
+              <text x="301" y="74" fill="#ffffff" font-size="12" font-family="'JetBrains Mono'" text-anchor="middle" font-weight="800">$90,000+</text>
+            </svg>
+
+            <div class="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-700/60 text-[11px]">
+              <div class="bg-slate-900/60 p-2 rounded-lg">
+                <span class="text-slate-400 block text-[9px] uppercase">Default Withholding</span>
+                <span class="text-rose-400 font-bold mono">$30,000 Lost</span>
+              </div>
+              <div class="bg-emerald-950/60 p-2 rounded-lg border border-emerald-500/30">
+                <span class="text-emerald-300 block text-[9px] uppercase">With TaxGlobe DTAA</span>
+                <span class="text-emerald-400 font-bold mono">Saved $20,000+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-800 pt-3 flex flex-wrap items-center justify-between text-xs text-slate-400 relative z-10">
+        <div class="flex items-center gap-4">
+          <span>🚀 Deployed: <a href="https://taxglobe-oowe.vercel.app" class="text-emerald-400 font-mono hover:underline">taxglobe-oowe.vercel.app</a></span>
+          <span>⚡ API: <span class="text-blue-400 font-mono">taxglobe.vercel.app</span></span>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Confidential & Proprietary
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 2: THE PROBLEM ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Problem Identification</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 02 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-6">
+          <span class="text-xs font-extrabold text-rose-600 uppercase tracking-wider">The Cross-Border Dilemma</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Global Revenue Shrinks by <span class="text-rose-600">30% to 45%</span> Before Founders Receive Payment
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-2">
+            Every year, over 45,000 Indian tech exporters, software development agencies, and SaaS founders invoice international clients without utilizing bilateral treaty exemptions.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+          <!-- Problem 1 -->
+          <div class="p-5 rounded-2xl bg-rose-50/70 border border-rose-200/80 shadow-sm relative overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-rose-500 text-white flex items-center justify-center font-bold text-base mb-3 shadow-md shadow-rose-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1.5">30% Statutory Deduction</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Foreign clients in the US (IRS), UK (HMRC), and EU withhold up to 30% at source on royalties, software subscriptions, and Technical Services (FTS).
+            </p>
+            <div class="mt-3 inline-block px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Unclaimed Revenue Loss</div>
+          </div>
+
+          <!-- Problem 2 -->
+          <div class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/80 shadow-sm relative overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-base mb-3 shadow-md shadow-amber-500/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1.5">Double Taxation Trap</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Without pre-filled Form 10F, Tax Residency Certificates (TRC), and Form 67 filings, founders pay Indian Corporate Tax on the same income without foreign tax credits.
+            </p>
+            <div class="mt-3 inline-block px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">Trapped Foreign Tax Credit</div>
+          </div>
+
+          <!-- Problem 3 -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="w-9 h-9 rounded-xl bg-slate-700 text-white flex items-center justify-center font-bold text-base mb-3 shadow-md">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1.5">Costly & Slow CA Firms</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Big 4 and cross-border law firms bill ₹2,00,000 to ₹10,00,000+ for international structuring opinions, taking 4 to 8 weeks with manual back-and-forth emails.
+            </p>
+            <div class="mt-3 inline-block px-2 py-0.5 rounded bg-slate-200 text-slate-800 text-[10px] font-bold">Inaccessible to Startups</div>
+          </div>
+        </div>
+
+        <!-- Cashflow Leakage Bar Graphic -->
+        <div class="p-4 bg-slate-900 rounded-2xl text-white flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">⚠️</div>
+            <div>
+              <h4 class="text-xs font-bold">Quantified Impact on a $100,000 SaaS Contract:</h4>
+              <p class="text-[11px] text-slate-400">Client pays $100k ➔ Foreign Tax IRS gets $30k ➔ India CIT takes $16k ➔ Founder gets only <strong>~$54k</strong>.</p>
+            </div>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-mono font-bold text-xs">
+            Net Margin Erosion: 46%
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>The Problem & Market Inefficiency</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 3: THE SOLUTION ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Product Value Proposition</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 03 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-6">
+          <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-wider">The TaxGlobe Solution</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Deterministic Treaty Software Replacing Weeks of Manual Legal Consulting
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-2">
+            TaxGlobe codifies 85+ bilateral Double Tax Avoidance Agreements into an intelligent self-serve platform that delivers audit-grade compliance in under 4 minutes.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+          <!-- Pillar 1 -->
+          <div class="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex-shrink-0 flex items-center justify-center font-black shadow-md shadow-emerald-500/20">
+              ⚡
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Instant DTAA Withholding Optimizer</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Applies Article 12 (Royalties/FTS) and Article 7 (Business Profits) to automatically reduce statutory 30% WHT down to treaty rates of <strong>0% to 10%</strong>.
+              </p>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded mt-2 inline-block">Section 90 / 90A Automation</span>
+            </div>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="p-5 rounded-2xl bg-blue-50/60 border border-blue-200/80 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex-shrink-0 flex items-center justify-center font-black shadow-md shadow-blue-500/20">
+              🏢
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">Multi-Jurisdiction HoldCo Simulator</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Simulates parent-subsidiary arbitrage across <strong>Singapore, Dubai DIFC, Delaware US, and UK</strong> to eliminate dividend distribution tax and capital gains.
+              </p>
+              <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded mt-2 inline-block">Offshore Entity Structuring</span>
+            </div>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="p-5 rounded-2xl bg-purple-50/60 border border-purple-200/80 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-purple-500 text-white flex-shrink-0 flex items-center justify-center font-black shadow-md shadow-purple-500/20">
+              📄
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">1-Click Statutory Filing Kit Generation</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Auto-generates verified electronic <strong>Form 10F dossiers</strong>, Indian Tax Residency Certificate (TRC) checklists, and certified No-PE (Permanent Establishment) declarations.
+              </p>
+              <span class="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded mt-2 inline-block">100% Audit-Ready</span>
+            </div>
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/80 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex-shrink-0 flex items-center justify-center font-black shadow-md shadow-amber-500/20">
+              🤖
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">TaxBot AI Cross-Border Advisor</h3>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                RAG-augmented conversational agent powered by Groq LLaMA-3, instantly answering complex transfer pricing, treaty provisions, and invoice structuring queries.
+              </p>
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded mt-2 inline-block">24/7 Contextual Guidance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between">
+          <span>✨ <strong>The Result:</strong> Founders save thousands of dollars on every foreign invoice with zero legal complexity.</span>
+          <span class="font-bold font-mono">Turnaround: &lt; 4 Minutes</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>The Solution & Value Matrix</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 4: TARGET MARKET & TAM ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Market Sizing & Personas</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 04 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-blue-600 uppercase tracking-wider">Massive Market Opportunity</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            $18.4 Billion Global Market Fueled by Indian Digital Exports
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Indian software and IT exports have crossed $200B/year, expanding at 12% CAGR, with over 10,000 new cross-border tech entities founded annually.
+          </p>
+        </div>
+
+        <!-- 3 Concentric Market Size Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <div class="p-4 rounded-2xl bg-slate-900 text-white">
+            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Total Addressable Market</span>
+            <div class="text-3xl font-black text-white font-mono mt-1 mb-1">$18.4 B</div>
+            <p class="text-xs text-slate-300">Global cross-border corporate tax compliance, transfer pricing software & treaty management.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-blue-900 text-white">
+            <span class="text-[10px] font-bold text-blue-300 uppercase tracking-wider">Serviceable Addressable Market</span>
+            <div class="text-3xl font-black text-white font-mono mt-1 mb-1">$3.2 B</div>
+            <p class="text-xs text-blue-100">Indian technology services, software exports & digital agencies billing international clients.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-900 text-white">
+            <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">Serviceable Obtainable Market</span>
+            <div class="text-3xl font-black text-white font-mono mt-1 mb-1">$240 M</div>
+            <p class="text-xs text-emerald-100">45,000+ Indian SaaS startups, tech consultancies & remote agencies billing $50k-$2M/yr.</p>
+          </div>
+        </div>
+
+        <!-- 4 Customer Personas Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg mb-1">💻</div>
+            <div class="font-bold text-slate-900">SaaS & Digital IP</div>
+            <p class="text-[11px] text-slate-500 mt-1">Software subscriptions, APIs & cloud licensing facing 30% royalty withholding.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg mb-1">🏢</div>
+            <div class="font-bold text-slate-900">IT Agencies & DevOps</div>
+            <p class="text-[11px] text-slate-500 mt-1">Custom software, UI/UX, and cloud consulting requiring Article 12 FTS relief.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg mb-1">💼</div>
+            <div class="font-bold text-slate-900">Remote Contractors</div>
+            <p class="text-[11px] text-slate-500 mt-1">High-earning developers & designers billing foreign companies via direct wire.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="text-lg mb-1">🌐</div>
+            <div class="font-bold text-slate-900">Export B2B Services</div>
+            <p class="text-[11px] text-slate-500 mt-1">Logistics, marketing & corporate services optimizing overseas entity structures.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Market Opportunity & Target Segments</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 5: SYSTEM ARCHITECTURE & TECH STACK ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">System Architecture</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 05 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-purple-600 uppercase tracking-wider">Modern Full-Stack Engineering</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Serverless, Zero-Latency, Audit-Grade Architecture
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Designed for sub-second deterministic calculations, real-time OTP authentication, and enterprise-grade reliability.
+          </p>
+        </div>
+
+        <!-- Visual Architecture Diagram Card -->
+        <div class="bg-slate-900 text-white p-5 rounded-2xl mb-4 border border-slate-800">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-center text-xs">
+            <!-- Col 1: Client -->
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase mono">Frontend UI</span>
+              <h4 class="font-bold text-sm text-white mt-2">React 18 + Vite</h4>
+              <p class="text-[11px] text-slate-400 mt-1">Tailwind CSS, Framer Motion, GSAP, Responsive Mobile/Desktop</p>
+              <div class="mt-2 text-[10px] text-emerald-400 font-mono">taxglobe-oowe.vercel.app</div>
+            </div>
+
+            <!-- Col 2: API Gateway -->
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+              <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase mono">API Gateway</span>
+              <h4 class="font-bold text-sm text-white mt-2">Express.js on Vercel</h4>
+              <p class="text-[11px] text-slate-400 mt-1">Serverless Handlers, CORS, JWT Auth, Nodemailer SMTP</p>
+              <div class="mt-2 text-[10px] text-blue-400 font-mono">taxglobe.vercel.app</div>
+            </div>
+
+            <!-- Col 3: Logic Engine -->
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+              <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-bold uppercase mono">Core Engine</span>
+              <h4 class="font-bold text-sm text-white mt-2">DTAA Rule Matrix</h4>
+              <p class="text-[11px] text-slate-400 mt-1">85+ Bilateral Treaties, HoldCo Arbitrage, Section 90 Calculators</p>
+              <div class="mt-2 text-[10px] text-purple-400 font-mono">Deterministic Math</div>
+            </div>
+
+            <!-- Col 4: Data & AI -->
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700">
+              <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase mono">Database & AI</span>
+              <h4 class="font-bold text-sm text-white mt-2">MongoDB + Groq</h4>
+              <p class="text-[11px] text-slate-400 mt-1">Atlas Cloud Cluster, LLaMA-3 TaxBot RAG, Encrypted Logs</p>
+              <div class="mt-2 text-[10px] text-amber-400 font-mono">sub-500ms AI</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Feature Highlights -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+            <span class="text-base">🔒</span>
+            <div>
+              <span class="font-bold text-slate-900 block">OTP Verified Security</span>
+              <span class="text-[11px] text-slate-500">Real-time Gmail SMTP verification to prevent spoofing.</span>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+            <span class="text-base">⚡</span>
+            <div>
+              <span class="font-bold text-slate-900 block">Zero-Cold-Start DB</span>
+              <span class="text-[11px] text-slate-500">Global cached Mongoose instance optimized for Vercel.</span>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+            <span class="text-base">🛡️</span>
+            <div>
+              <span class="font-bold text-slate-900 block">RBAC Admin Protection</span>
+              <span class="text-[11px] text-slate-500">Only authorized Admin accounts can access confidential leads.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Technical Architecture & Infrastructure</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 6: CORE SHIPPED PRODUCT MODULES ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Shipped Functionality</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 06 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-wider">Live Product Overview</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            4 Interactive Core Modules Fully Shipped & Live
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Every module below is accessible today on <a href="https://taxglobe-oowe.vercel.app" class="text-emerald-600 underline font-semibold">taxglobe-oowe.vercel.app</a>.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- Card 1 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">1</span>
+                DTAA Treaty Calculator
+              </span>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">Live</span>
+            </div>
+            <p class="text-slate-600 mb-2.5 leading-relaxed">
+              Founders select source/destination country (US, SG, UAE, UK, EU) and revenue stream (SaaS, FTS, Royalty). The calculator generates domestic withholding vs treaty rate and displays exact dollar savings.
+            </p>
+            <div class="p-2 bg-white rounded-lg border text-slate-700 font-mono text-[11px] flex justify-between">
+              <span>e.g. US ⇄ India Software Royalty</span>
+              <span class="text-emerald-600 font-bold">30% ➔ 15% (Save $15k/100k)</span>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
+                <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">2</span>
+                Offshore HoldCo Simulator
+              </span>
+              <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-bold">Live</span>
+            </div>
+            <p class="text-slate-600 mb-2.5 leading-relaxed">
+              Provides multi-scenario modeling: Domestic Indian Pvt Ltd vs Singapore Parent vs Dubai DIFC vs Delaware C-Corp. Compares corporate tax, dividend distribution tax, and capital gains exemptions.
+            </p>
+            <div class="p-2 bg-white rounded-lg border text-slate-700 font-mono text-[11px] flex justify-between">
+              <span>Singapore / UAE DIFC Advantage</span>
+              <span class="text-blue-600 font-bold">0% Capital Gains &amp; Dividends</span>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
+                <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs">3</span>
+                Treaty Codex & Corridor Visualizer
+              </span>
+              <span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[10px] font-bold">Live</span>
+            </div>
+            <p class="text-slate-600 mb-2.5 leading-relaxed">
+              Searchable database of 85+ bilateral tax treaties with clause-by-clause legal breakdowns of Articles 7, 10, 11, 12, and 13. Includes statutory compliance checklists and filing requirements.
+            </p>
+            <div class="p-2 bg-white rounded-lg border text-slate-700 font-mono text-[11px] flex justify-between">
+              <span>Statutory Mapping</span>
+              <span class="text-purple-600 font-bold">85+ Treaties Indexed</span>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
+                <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs">4</span>
+                TaxBot AI Floating Advisor
+              </span>
+              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">Live</span>
+            </div>
+            <p class="text-slate-600 mb-2.5 leading-relaxed">
+              Context-aware chatbot accessible on all screens. Answers user questions on TRC validity, Section 90 credit limits, BEPS regulations, and Form 10F electronic portal procedures in real time.
+            </p>
+            <div class="p-2 bg-white rounded-lg border text-slate-700 font-mono text-[11px] flex justify-between">
+              <span>Powered by Groq Cloud</span>
+              <span class="text-amber-600 font-bold">Sub-Second RAG Answers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Core Modules & Product Feature Set</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 7: ONBOARDING & LEAD CAPTURE ENGINE ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">User Onboarding & Funnel</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 07 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-teal-600 uppercase tracking-wider">High-Conversion Lead Engine</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Frictionless 3-Step Verified Onboarding Journey
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Engineered to capture high-intent founder leads, verify corporate email validity, and generate customized tax optimization assessments.
+          </p>
+        </div>
+
+        <!-- 3-Step Visual Progress Stepper -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <!-- Step 1 -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <span class="w-7 h-7 rounded-lg bg-teal-500 text-white font-bold text-xs flex items-center justify-center">1</span>
+              <span class="text-[10px] font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded">Identity Verification</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1">Entity Details & Email OTP</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              Founder inputs Legal Entity Name, Business Email, and Mobile Number. TaxGlobe sends an instant 6-digit verification OTP to ensure verified corporate contacts.
+            </p>
+            <div class="p-2 bg-white rounded border text-[10px] text-slate-500 font-mono">
+              🛡️ Verified via Gmail SMTP
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <span class="w-7 h-7 rounded-lg bg-blue-500 text-white font-bold text-xs flex items-center justify-center">2</span>
+              <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">Tax Profiling</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1">Business Model & Billing</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              Categorizes business model into SaaS, IT Agency, Freelancer, or Exporter, and selects monthly international billing range (&lt;₹5L to ₹50L+/mo).
+            </p>
+            <div class="p-2 bg-white rounded border text-[10px] text-slate-500 font-mono">
+              📊 Classifies Section 90 Exposure
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <span class="w-7 h-7 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center">3</span>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Instant Assessment</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 mb-1">Custom Optimization Roadmap</h3>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              Generates personalized tax savings report, filing kit recommendations, and offshore holding company structuring scores tailored to the founder.
+            </p>
+            <div class="p-2 bg-white rounded border text-[10px] text-slate-500 font-mono">
+              🎯 Routes to Admin Dashboard
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-900 text-white rounded-2xl flex flex-wrap items-center justify-between text-xs gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>All verified leads automatically sync to MongoDB Atlas and trigger follow-up structuring workflows.</span>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold text-[11px]">99.4% Delivery Success</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Customer Onboarding & Lead Progression</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 8: ADMIN OPERATIONS & CONTROL CENTER ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-800"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Internal Operations</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 08 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Internal Control & Governance</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Centralized Admin Command Center & Lead Telemetry
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Built-in operational portal enabling leadership to monitor inbound client leads, review simulation volume, and manage system security.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 text-xs">
+          <!-- Left: RBAC Gate -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">🔐</div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Role-Based Access Control (RBAC)</h3>
+                <span class="text-[10px] text-slate-500">Zero data leaks to unauthorized users</span>
+              </div>
+            </div>
+            <p class="text-slate-600 leading-relaxed mb-3">
+              The internal leads table has been removed from public view. Only authenticated accounts possessing the <code>Admin</code> role can access the <code>#admin</code> dashboard.
+            </p>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 space-y-1.5 font-mono text-[11px]">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Super Admin Account:</span>
+                <span class="font-bold text-slate-900">admin@gmail.com</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">System Role:</span>
+                <span class="text-emerald-600 font-bold">Admin (Full Access)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Telemetry Features -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">📊</div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Operational Telemetry Modules</h3>
+                <span class="text-[10px] text-slate-500">Live analytics & pipeline monitoring</span>
+              </div>
+            </div>
+            <ul class="text-slate-600 space-y-2 list-disc list-inside">
+              <li><strong>Real-Time Leads Feed:</strong> Direct view of company legal names, verified emails, phone numbers, and revenue tiers.</li>
+              <li><strong>User Management:</strong> Filter users by role (Founder vs Admin) and inspect registration metadata.</li>
+              <li><strong>OTP Delivery Audit Logs:</strong> Tracks every OTP dispatched, delivery latencies, and verification status.</li>
+              <li><strong>Corridor Heatmap:</strong> Tracks the highest-demand treaty corridors to focus sales and legal research.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-100 rounded-xl text-slate-700 text-xs flex justify-between items-center">
+          <span>🛡️ <strong>Compliance Safeguard:</strong> All customer data encrypted in transit (TLS 1.3) and at rest (AES-256).</span>
+          <span class="font-mono font-bold text-slate-900">SOC-2 Type II Roadmap</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Admin Command & Security Governance</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 9: BUSINESS & REVENUE MODEL ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monetization & Economics</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 09 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-emerald-600 uppercase tracking-wider">Commercial Strategy</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Recurring SaaS Subscriptions + High-Value Legal Structuring
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            A high-margin blended revenue engine combining predictable software ARR with high-ticket legal services.
+          </p>
+        </div>
+
+        <!-- 3 Monetization Tiers -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 text-xs">
+          <!-- Tier 1 -->
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">Tier 1: Software</span>
+            <h3 class="text-base font-extrabold text-slate-900 mt-1">Pro SaaS Platform</h3>
+            <div class="text-xl font-black text-slate-900 font-mono mt-1 mb-3">₹4,999 – ₹14,999 <span class="text-xs text-slate-400 font-normal">/ mo</span></div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Unlimited treaty corridor simulations</li>
+              <li>Real-time WHT tax tracker dashboard</li>
+              <li>24/7 Priority TaxBot AI assistance</li>
+              <li>Treaty amendment regulatory alerts</li>
+            </ul>
+          </div>
+
+          <!-- Tier 2 -->
+          <div class="p-5 rounded-2xl bg-emerald-50/70 border-2 border-emerald-500 shadow-md relative">
+            <span class="absolute -top-3 right-4 px-2 py-0.5 rounded-full bg-emerald-500 text-white font-bold text-[10px] uppercase">Most Popular</span>
+            <span class="text-emerald-700 font-bold uppercase text-[10px]">Tier 2: Compliance</span>
+            <h3 class="text-base font-extrabold text-slate-900 mt-1">Statutory Filing Kits</h3>
+            <div class="text-xl font-black text-emerald-700 font-mono mt-1 mb-3">₹25,000 <span class="text-xs text-slate-500 font-normal">/ corridor / yr</span></div>
+            <ul class="text-slate-700 space-y-1.5 list-disc list-inside">
+              <li>Pre-filled electronic Form 10F filing packs</li>
+              <li>Indian TRC application preparation</li>
+              <li>Form 67 Foreign Tax Credit (FTC) kits</li>
+              <li>No-PE legal declarations & undertakings</li>
+            </ul>
+          </div>
+
+          <!-- Tier 3 -->
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">Tier 3: Advisory</span>
+            <h3 class="text-base font-extrabold text-slate-900 mt-1">Turnkey HoldCo Setup</h3>
+            <div class="text-xl font-black text-slate-900 font-mono mt-1 mb-3">₹2,50,000 – ₹5,00,000 <span class="text-xs text-slate-400 font-normal">/ setup</span></div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Offshore HoldCo incorporation (SG / DIFC)</li>
+              <li>Cross-border transfer pricing policy</li>
+              <li>International banking introduction</li>
+              <li>Annual corporate secretarial retainer</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Unit Economics Bar -->
+        <div class="p-4 bg-slate-900 text-white rounded-2xl flex flex-wrap items-center justify-between text-xs gap-3">
+          <div><span class="text-slate-400 block text-[10px] uppercase">Blended Gross Margin</span><span class="text-emerald-400 font-bold font-mono text-base">85% – 88%</span></div>
+          <div><span class="text-slate-400 block text-[10px] uppercase">Average First-Year ACV</span><span class="text-white font-bold font-mono text-base">₹64,000</span></div>
+          <div><span class="text-slate-400 block text-[10px] uppercase">LTV / CAC Ratio</span><span class="text-emerald-400 font-bold font-mono text-base">11.2x</span></div>
+          <div><span class="text-slate-400 block text-[10px] uppercase">CAC Payback Period</span><span class="text-white font-bold font-mono text-base">3.1 Months</span></div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Commercial Model & Unit Economics</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 10: COMPETITIVE ADVANTAGE ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Competitive Differentiation</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 10 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-indigo-600 uppercase tracking-wider">Market Landscape</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Why TaxGlobe Wins Over Legacy Alternatives
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Comparing TaxGlobe with traditional CA firms, US incorporation tools (Stripe Atlas), and general bookkeeping software.
+          </p>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-xs text-left border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-3">Capability / Metric</th>
+                <th class="p-3">Traditional Big 4 / CAs</th>
+                <th class="p-3">Stripe Atlas / Clerky</th>
+                <th class="p-3">Zoho / QuickBooks</th>
+                <th class="p-3 bg-emerald-50 text-emerald-900 font-extrabold">TaxGlobe Platform</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">Execution Speed</td>
+                <td class="p-3 text-rose-600">3 – 6 Weeks</td>
+                <td class="p-3 text-slate-600">1 – 2 Weeks</td>
+                <td class="p-3 text-slate-600">Instant (Invoicing only)</td>
+                <td class="p-3 bg-emerald-50/50 font-bold text-emerald-700">Instant (&lt; 4 Minutes)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">Bilateral DTAA Logic</td>
+                <td class="p-3 text-slate-600">Manual consulting</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 bg-emerald-50/50 font-bold text-emerald-700">85+ Treaties Codified</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">Section 90 Relief Math</td>
+                <td class="p-3 text-slate-600">Custom opinions</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 bg-emerald-50/50 font-bold text-emerald-700">Real-Time Deterministic</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">Form 10F / TRC Packs</td>
+                <td class="p-3 text-slate-600">Manual paperwork</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 text-rose-600">❌ None</td>
+                <td class="p-3 bg-emerald-50/50 font-bold text-emerald-700">1-Click Auto-Generated</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">Cost to Founder</td>
+                <td class="p-3 text-rose-600">₹2,00,000 – ₹10,00,000+</td>
+                <td class="p-3 text-slate-600">$500 one-time</td>
+                <td class="p-3 text-slate-600">₹1,500/mo</td>
+                <td class="p-3 bg-emerald-50/50 font-bold text-emerald-700">10x Cheaper (From ₹4,999)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex justify-between items-center">
+          <span>🛡️ <strong>Defensible Moat:</strong> Proprietary codified rule graphs mapping bilateral treaties directly to CBDT and IRS forms. High switching cost once an entity relies on TaxGlobe compliance dossiers.</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Competitive Moat & Market Positioning</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 11: TEAM ROLES & ASSIGNED SPRINTS ================= -->
+    <section class="slide-page bg-white text-slate-900 relative bg-grid">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Team Allocation & Roadmap</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-400">PAGE 11 / 12</span>
+      </div>
+
+      <div class="my-auto py-4">
+        <div class="max-w-3xl mb-5">
+          <span class="text-xs font-extrabold text-blue-600 uppercase tracking-wider">Execution Strategy</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+            Incoming Teammate Workstreams & Next Sprints
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">
+            Clear role allocation for incoming team members assigned by Higher Authority to accelerate product scaling.
+          </p>
+        </div>
+
+        <!-- 4 Teammate Tracks -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-xs">
+          <!-- Track 1: Frontend -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-extrabold text-slate-900 text-sm">Track 1: Frontend & UI/UX Engineers</h3>
+              <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-bold">Client Layer</span>
+            </div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Optimize mobile touch gestures and responsive table views.</li>
+              <li>Implement client-side PDF export directly in the browser.</li>
+              <li>Add interactive visual corridor maps for remittance flows.</li>
+            </ul>
+          </div>
+
+          <!-- Track 2: Backend -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-extrabold text-slate-900 text-sm">Track 2: Backend & Integration Engineers</h3>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">Serverless & DB</span>
+            </div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Integrate official CBDT e-filing portal APIs for digital submissions.</li>
+              <li>Add Stripe / Razorpay webhooks for automated SaaS billing.</li>
+              <li>Optimize MongoDB indexing on leads and simulation collections.</li>
+            </ul>
+          </div>
+
+          <!-- Track 3: Tax Codex -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-extrabold text-slate-900 text-sm">Track 3: Tax Intelligence & Legal Analysts</h3>
+              <span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[10px] font-bold">Knowledge Base</span>
+            </div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Expand bilateral treaty coverage from 85 to 120+ international corridors.</li>
+              <li>Codify transfer pricing safe harbor rules and Arm's Length Pricing formulas.</li>
+              <li>Verify bilateral tax information exchange agreements (TIEA).</li>
+            </ul>
+          </div>
+
+          <!-- Track 4: QA & Growth -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-extrabold text-slate-900 text-sm">Track 4: QA, Testing & CA Partnerships</h3>
+              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">Growth & Quality</span>
+            </div>
+            <ul class="text-slate-600 space-y-1.5 list-disc list-inside">
+              <li>Execute end-to-end regression tests across all calculator corridors.</li>
+              <li>Run pilot onboarding programs with 10 partner CA firms.</li>
+              <li>Track conversion funnel metrics and user retention analytics.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs text-blue-900 flex justify-between items-center">
+          <span>📋 <strong>Sprint Rhythm:</strong> Weekly sprint planning with git-flow PR reviews and automated Vercel preview environments.</span>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-400">
+        <span>TaxGlobe Business Deck</span>
+        <span>Team Allocation & Sprint Workstreams</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 12: PROJECT STATUS & LIVE LINKS ================= -->
+    <section class="slide-page bg-slate-900 text-white relative overflow-hidden">
+      <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3 relative z-10">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Project Summary & Handover</span>
+        </div>
+        <span class="text-xs font-mono font-bold text-slate-500">PAGE 12 / 12</span>
+      </div>
+
+      <div class="my-auto py-4 relative z-10">
+        <div class="text-center max-w-xl mx-auto mb-6">
+          <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-2 border border-emerald-500/30">
+            DEPLOYMENT & HANDOVER READY
+          </span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
+            TaxGlobe is Live & Ready for Scaling
+          </h2>
+          <p class="text-xs md:text-sm text-slate-400 mt-1">
+            Frontend, Backend API, and Database connections are live, fully functional, and accessible below.
+          </p>
+        </div>
+
+        <!-- 3 Clickable Link Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <a href="https://taxglobe-oowe.vercel.app" target="_blank" class="p-4 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500 transition block text-left group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-emerald-400 uppercase">Live Application</span>
+              <span class="text-xs group-hover:translate-x-1 transition">↗</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Frontend (Vercel)</h4>
+            <span class="text-xs text-slate-400 font-mono block mt-1 underline break-all">taxglobe-oowe.vercel.app</span>
+          </a>
+
+          <a href="https://taxglobe.vercel.app/api/health" target="_blank" class="p-4 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-blue-500 transition block text-left group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-blue-400 uppercase">Live REST API</span>
+              <span class="text-xs group-hover:translate-x-1 transition">↗</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Backend & DB (Vercel)</h4>
+            <span class="text-xs text-slate-400 font-mono block mt-1 underline break-all">taxglobe.vercel.app/api/health</span>
+          </a>
+
+          <a href="https://github.com/dhruvdubey0004-cyber/taxglobe" target="_blank" class="p-4 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-purple-500 transition block text-left group">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-purple-400 uppercase">Source Code</span>
+              <span class="text-xs group-hover:translate-x-1 transition">↗</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">GitHub Repository</h4>
+            <span class="text-xs text-slate-400 font-mono block mt-1 underline break-all">github.com/.../taxglobe</span>
+          </a>
+        </div>
+
+        <!-- Official Signoff Card -->
+        <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div>
+            <span class="text-slate-500 text-[10px] uppercase font-bold block">Submitted By</span>
+            <span class="text-base font-extrabold text-emerald-400">Dhruv Dubey</span>
+            <span class="text-slate-400 block text-[11px]">Project Lead | dhruvdubey0004@gmail.com</span>
+          </div>
+
+          <div class="text-right">
+            <span class="text-slate-500 text-[10px] uppercase font-bold block">Assigned Reviewer</span>
+            <span class="text-base font-extrabold text-white">~Rajesh Kumar</span>
+            <span class="text-emerald-400 block text-[11px] font-semibold">✅ 12-Pager Deck & Deployed Links Completed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800 pt-3 flex justify-between text-xs text-slate-500 relative z-10">
+        <span>TaxGlobe 12-Pager Project Business Deck</span>
+        <span>Ready for Teammates & Stakeholders</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- PDF GENERATION JAVASCRIPT LOGIC -->
+  <script>
+    function downloadPDF() {
+      const btn = document.getElementById('downloadPdfBtn');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating PDF...`;
+      btn.disabled = true;
+
+      const element = document.getElementById('deckContent');
+      const opt = {
+        margin:       0,
+        filename:     'TaxGlobe_12_Pager_Business_Deck.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'in', format: [12.5, 7.8], orientation: 'landscape' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+      };
+
+      html2pdf().set(opt).from(element).save()
+        .then(() => {
+          btn.innerHTML = originalHTML;
+          btn.disabled = false;
+        })
+        .catch(err => {
+          console.error('PDF generation error:', err);
+          // Fallback to native print if html2pdf encounters an issue
+          window.print();
+          btn.innerHTML = originalHTML;
+          btn.disabled = false;
+        });
+    }
+  </script>
+</body>
+</html>

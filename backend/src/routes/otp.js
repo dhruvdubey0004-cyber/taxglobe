@@ -115,8 +115,8 @@ router.post('/verify', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
     }
 
-    // Delete used OTP
-    await OTP.deleteMany({ email: email.toLowerCase() });
+    // Don't delete OTP here — let the register route delete it after account creation
+    // This way the OTP stays valid for the final registration step
 
     res.json({ success: true, message: 'OTP verified successfully' });
   } catch (err) {

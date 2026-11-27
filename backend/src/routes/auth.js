@@ -2,19 +2,38 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const OTP = require('../models/otp');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// REGISTER
+// REGISTER (requires OTP verified)
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, otpCode } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email & password are required' });
+    }
+    if (!otpCode) {
+      return res.status(400).json({ message: 'Please verify your email with OTP first' });
+    }
+
+    // Verify OTP one final time before creating account
+    const otpRecord = await OTP.findOne({ email: email.toLowerCase(), otp: otpCode });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP. Please resend and verify again.' });
+    }
+
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed, role: role || 'User' });
-    res.status(201).json({ message: 'User created', userId: user._id });
+    const user = await User.create({ name, email, password: hashed, role: role || 'User', emailVerified: true });
+
+    // Clean up OTP
+    await OTP.deleteMany({ email: email.toLowerCase() });
+
+    res.status(201).json({ message: 'Account created & email verified! Please log in.', userId: user._id });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
